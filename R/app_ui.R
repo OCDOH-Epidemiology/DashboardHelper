@@ -14,7 +14,10 @@ app_ui <- function(request) {
       tags$section(
         class = "p-4",
         shiny::selectInput("section_selection", "What code do you want to generate?", c("Page Header", "Page Footer", "Section with one indicator", "Section with multiple indicators")),
-        mod_page_head_ui("page-head")
+        mod_page_head_ui("page-head"),
+        mod_add_section_with_one_indicator_ui("single-indicator"),
+        mod_add_section_with_one_indicator_server("multiple-indicators"),
+        mod_add_page_foot_ui("page-foot")
       )
     )
   )
