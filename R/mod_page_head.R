@@ -44,11 +44,12 @@ mod_page_head_server <- function(id, section_selection) {
           )
         ),
         shiny::uiOutput(ns("page_head_output")),
+        tags$br(),
         shiny::verbatimTextOutput(ns("page_head_generated_code"))
       )
     })
 
-    output$page_head_paragraph_inputs <- renderUI({
+    output$page_head_paragraph_inputs <- shiny::renderUI({
       req(input$head_num_paragraphs)
 
       lapply(1:input$head_num_paragraphs, function(paragraph_number) {
@@ -56,7 +57,7 @@ mod_page_head_server <- function(id, section_selection) {
       })
     })
 
-    output$page_head_button_inputs <- renderUI({
+    output$page_head_button_inputs <- shiny::renderUI({
       req(input$head_num_buttons)
 
       lapply(1:input$head_num_buttons, function(button_number) {
@@ -64,7 +65,7 @@ mod_page_head_server <- function(id, section_selection) {
       })
     })
 
-    output$page_head_output <- renderUI({
+    output$page_head_output <- shiny::renderUI({
       tagList(
         tags$h2("Result"),
         add_page_head(
@@ -79,7 +80,7 @@ mod_page_head_server <- function(id, section_selection) {
       )
     })
 
-    output$page_head_generated_code <- renderPrint({
+    output$page_head_generated_code <- shiny::renderPrint({
       paragraphs_combined <- ""
 
       for (paragraph_number in 1:input$head_num_paragraphs) {
