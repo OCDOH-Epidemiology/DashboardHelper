@@ -9,8 +9,13 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
-    fluidPage(
-      h1("DashboardHelper")
+    bootstrapPage(
+      theme = bslib::bs_theme(version = 5),
+      tags$section(
+        class = "p-4",
+        shiny::selectInput("section_selection", "What code do you want to generate?", c("Page Header", "Page Footer", "Section with one indicator", "Section with multiple indicators")),
+        mod_page_head_ui("page-head")
+      )
     )
   )
 }

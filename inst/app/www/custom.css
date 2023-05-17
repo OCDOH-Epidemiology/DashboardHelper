@@ -1,0 +1,49 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1 {
+  font-weight: 900;
+}
+
+sup {
+  font-weight: 600;
+}
+
+.bg-blue-jeans {
+  background: #61c2ee;
+  color: #40514e;
+}
+
+.bg-outer-space {
+  background-color: #40514e;
+  color: #d7ecfa;
+}
+
+.bg-palm-leaf {
+  background-color: #67a142;
+  color: #40514e;
+}
+
+.bg-persian-green {
+  background-color: #00a79e;
+  color: #d7ecfa;
+}
+
+.bg-teal {
+  background-color: #007b85;
+  color: white;
+}
+
+.bg-water {
+  background-color: #d7ecfa;
+  color: #40514e;
+}
+
+.footnote-link {
+  color: #d7ecfa;
+}
+
+.footnote-link:hover {
+  color: #61c2ee;
+}

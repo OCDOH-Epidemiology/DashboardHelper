@@ -6,4 +6,7 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
+  mod_page_head_server("page-head", reactive(input$section_selection))
+
+  
 }
