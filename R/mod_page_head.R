@@ -109,7 +109,7 @@ mod_page_head_server <- function(id, section_selection) {
         "  sections = list(",
         buttons_combined,
         "  )",
-        ")",
+        "),",
         sep = "\n"
       )
     })
