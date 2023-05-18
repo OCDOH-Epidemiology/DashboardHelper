@@ -32,7 +32,7 @@ mod_page_foot_server <- function(id, section_selection) {
         shiny::sliderInput(ns("num_footnotes"), "How many footnotes are there?", 1, 15, 1, 1, width = "50%"),
         tags$h3("If the footnote is not a link, leave the URL blank."),
         shiny::uiOutput(ns("footnote_inputs")),
-        shiny::uiOutput(ns("result")),
+        shiny::uiOutput(ns("preview")),
         tags$br(),
         shiny::verbatimTextOutput(ns("generated_code"))
       )
@@ -56,7 +56,7 @@ mod_page_foot_server <- function(id, section_selection) {
       })
     })
 
-    output$result <- renderUI({
+    output$preview <- renderUI({
       req(input$num_footnotes)
 
       my_list <- lapply(1:input$num_footnotes, function(footnote_number) {
@@ -77,8 +77,11 @@ mod_page_foot_server <- function(id, section_selection) {
         }
       })
 
-      add_page_foot(
-        my_list
+      tagList(
+        tags$h2("Preview"),
+        add_page_foot(
+          my_list
+        )
       )
     })
 
