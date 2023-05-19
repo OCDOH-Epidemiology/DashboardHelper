@@ -15,7 +15,9 @@ app_ui <- function(request) {
         class = "p-4",
         shiny::selectInput("section_selection", "What code do you want to generate?", c("Page Header", "Page Footer", "Section with one indicator", "Section with multiple indicators")),
         mod_page_head_ui("page-head"),
-        mod_page_foot_ui("page-foot")
+        mod_page_foot_ui("page-foot"),
+        mod_section_with_one_indicator_ui("one-indicator"),
+        mod_section_with_multiple_indicators_ui("multi-indicator")
       )
     )
   )
