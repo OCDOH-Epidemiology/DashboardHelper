@@ -12,7 +12,7 @@ add_page_head <- function(indicator, description = list(), sections = list()) {
     home_button(),
     tags$h1(indicator),
     lapply(description, function(x) {
-      tags$p(x)
+      tags$p(HTML(x))
     }),
     tags$div(
       class = "d-flex justify-content-center",
