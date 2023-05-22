@@ -13,23 +13,25 @@
 #'            Each list must contain an id, and can contain a finding, title, and footnote
 #'
 #' @noRd
-add_section_with_one_indicator <- function(ns, indicator, description, bg_color = "bg-white", main_finding = "", ...) {
+add_section_with_one_indicator <- function(ns, indicator, description, bg_color = "bg-white", main_finding = "", graphs) {
   tags$section(
-    id = gsub(" ", "-", tolower(indicator)),
-    class = paste0(bg_color, " px-5 py-3"),
+    id = format_id(indicator),
+    class = paste0(bg_color, " px-5 py-3 border"),
     tags$h3(class = "fw-bold", indicator),
-    HTML(class = "", description),
+    lapply(description, function(x) {
+      tags$p(HTML(class = "", x))
+    }),
     tags$h3(class = "text-center fw-bold mt-3", main_finding),
     tags$div(
       class = "row mt-1 g-4 justify-content-center",
-      lapply(list(...), function(x) {
+      lapply(graphs, function(x) {
         tags$div(
           class = "col-lg-6",
           tags$div(
             class = "w-100 h-100 d-flex flex-column justify-content-between",
-            tags$h3(class = "text-center fs-3 fw-bold", x$finding),
-            tags$h5(class = "text-center mt-4", x$title),
-            mod_add_graph_ui(ns(x$id)),
+            tags$h3(class = "text-center fs-3 fw-bold", HTML(x$finding)),
+            tags$h5(class = "text-center mt-4", HTML(x$title)),
+            shinipsum::random_ggplotly("bar"),
             tags$div(style = "font-size: .75rem;", class = "px-5", HTML(x$footnote))
           )
         )
