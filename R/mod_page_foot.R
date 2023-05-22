@@ -96,7 +96,7 @@ mod_page_foot_server <- function(id, section_selection) {
           return()
         }
 
-        footnotes_combined <- paste0(footnotes_combined, "list(text = \"", footnote_text, "\"")
+        footnotes_combined <- paste0(footnotes_combined, "    list(text = \"", footnote_text, "\"")
 
         if (footnote_url != "") {
           footnotes_combined <- paste0(footnotes_combined, ", url = \"", footnote_url, "\"")
@@ -114,7 +114,9 @@ mod_page_foot_server <- function(id, section_selection) {
 
       cat(
         "add_page_foot(",
+        "  list(",
         footnotes_combined,
+        "  )",
         "),",
         sep = "\n"
       )
