@@ -45,9 +45,14 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
             shiny::uiOutput(ns("graph_inputs"))
           )
         ),
+        tags$h2("Preview"),
         shiny::uiOutput(ns("preview")),
         tags$br(),
-        shiny::verbatimTextOutput(ns("generated_code"))
+        tags$h2("UI Code"),
+        shiny::verbatimTextOutput(ns("generated_code_UI")),
+        tags$br(),
+        tags$h2("Server Code"),
+        shiny::verbatimTextOutput(ns("generated_code_Server"))
       )
     })
 
@@ -64,7 +69,7 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
 
       lapply(1:input$num_graphs, function(graph_number) {
         tags$div(
-          class = "row gx-3",
+          class = "row gx-3 border",
           tags$div(
             class = "col-3",
             shiny::textInput(ns(paste0("id", graph_number)), paste0("Graph ", graph_number, " ID"), width = "100%", value = letters[graph_number])
@@ -80,6 +85,22 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
           tags$div(
             class = "col-3",
             shiny::textAreaInput(ns(paste0("footnote", graph_number)), paste0("Graph ", graph_number, " Footnote"), width = "100%")
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("data_source", graph_number)), paste0("Graph ", graph_number, " Data Source"), width = "100%")
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_title", graph_number)), paste0("Graph ", graph_number, " Y-Axis Title"), width = "100%")
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_format", graph_number)), paste0("Graph ", graph_number, " Y-Axis Format"), width = "100%")
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_hover", graph_number)), paste0("Graph ", graph_number, " Hover Format"), width = "100%", value = ".1f")
           )
         )
       })
@@ -87,7 +108,6 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
 
     output$preview <- shiny::renderUI({
       tagList(
-        tags$h2("Preview"),
         add_section_with_one_indicator(
           ns = ns,
           indicator = input$main_indicator,
@@ -108,7 +128,7 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
       )
     })
 
-    output$generated_code <- renderPrint({
+    output$generated_code_UI <- renderPrint({
       description_args <- ""
       for (paragraph_number in 1:input$num_paragraphs) {
         description_args <- paste0(description_args, "    \"", input[[paste0("paragraph_", paragraph_number)]], "\"")
@@ -142,15 +162,40 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
         paste0("  indicator = \"", input$main_indicator, "\","),
         paste0("  description = list("),
         description_args,
-        "  )",
-        paste0("  bg_color = \"", input$bg_color, "\""),
-        paste0("  main_finding = \"", input$main_finding, "\""),
+        "  ),",
+        paste0("  bg_color = \"", input$bg_color, "\","),
+        paste0("  main_finding = \"", input$main_finding, "\","),
         "  list(",
         graph_args,
         "  )",
         "),",
         sep = "\n"
       )
+    })
+
+    output$generated_code_Server <- renderPrint({
+      module_calls <- NULL
+      for (graph_number in 1:input$num_graphs) {
+        module_calls <- paste0(
+          module_calls,
+          "mod_add_graph_server(\n",
+          "  id = \"", format_id(input[[paste0("id", graph_number)]]) , "\",\n",
+          "  data_in = \"", input[[paste0("data_source", graph_number)]] , "\",\n",
+          "  y_title = \"", input[[paste0("y_title", graph_number)]] , "\",\n",
+          "  y_format = \"", input[[paste0("y_format", graph_number)]] , "\",\n",
+          "  y_hover = \"", input[[paste0("y_hover", graph_number)]] , "\"\n",
+          ")"
+        )
+
+        if (graph_number < input$num_graphs) {
+          module_calls <- paste0(module_calls, ",\n\n")
+        }
+      }
+
+      cat(
+        module_calls
+      )
+
     })
   })
 }
