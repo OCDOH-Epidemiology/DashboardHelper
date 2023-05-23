@@ -47,10 +47,8 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
         ),
         tags$h2("Preview"),
         shiny::uiOutput(ns("preview")),
-        tags$br(),
         tags$h2("UI Code"),
         shiny::verbatimTextOutput(ns("generated_code_UI")),
-        tags$br(),
         tags$h2("Server Code"),
         shiny::verbatimTextOutput(ns("generated_code_Server"))
       )
@@ -106,7 +104,33 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
       })
     })
 
+    observe({
+      req(input$num_graphs)
+
+      lapply(1:input$num_graphs, function(graph_number) {
+        id <- req(format_id(input[[paste0("id", graph_number)]]))
+        local({
+          output[[id]] <- plotly::renderPlotly({
+            cars %>% dplyr::group_by(speed) %>% dplyr::summarise(dist = sum(dist)) %>%
+            plotly::plot_ly(x = ~speed, y = ~dist * 10, type = "bar") %>%
+            plotly::layout(
+              xaxis = list(title = "", categoryorder = "trace", fixedrange = TRUE),
+              yaxis = list(
+                title = input[[paste0("y_title", graph_number)]],
+                tickformat = input[[paste0("y_format", graph_number)]],
+                hoverformat = input[[paste0("y_hover", graph_number)]],
+                fixedrange = TRUE
+              )
+            )
+          })
+        })
+      })
+    })
+
     output$preview <- shiny::renderUI({
+      # Necessary delay to ensure that graph inputs are generated before rendering the graphs
+      Sys.sleep(.1)
+
       tagList(
         add_section_with_one_indicator(
           ns = ns,
@@ -117,6 +141,7 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
           bg_color = input$bg_color,
           main_finding = input$main_finding,
           graphs = lapply(1:input$num_graphs, function(graph_number) {
+            req(input[[paste0("id", graph_number)]])
             list(
               id = input[[paste0("id", graph_number)]],
               finding = input[[paste0("finding", graph_number)]],
@@ -168,7 +193,7 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
         "  list(",
         graph_args,
         "  )",
-        "),",
+        ")",
         sep = "\n"
       )
     })
@@ -179,11 +204,11 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
         module_calls <- paste0(
           module_calls,
           "mod_add_graph_server(\n",
-          "  id = \"", format_id(input[[paste0("id", graph_number)]]) , "\",\n",
-          "  data_in = \"", input[[paste0("data_source", graph_number)]] , "\",\n",
-          "  y_title = \"", input[[paste0("y_title", graph_number)]] , "\",\n",
-          "  y_format = \"", input[[paste0("y_format", graph_number)]] , "\",\n",
-          "  y_hover = \"", input[[paste0("y_hover", graph_number)]] , "\"\n",
+          "  id = \"", format_id(input[[paste0("id", graph_number)]]), "\",\n",
+          "  data_in = \"", input[[paste0("data_source", graph_number)]], "\",\n",
+          "  y_title = \"", input[[paste0("y_title", graph_number)]], "\",\n",
+          "  y_format = \"", input[[paste0("y_format", graph_number)]], "\",\n",
+          "  y_hover = \"", input[[paste0("y_hover", graph_number)]], "\"\n",
           ")"
         )
 
@@ -195,7 +220,6 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
       cat(
         module_calls
       )
-
     })
   })
 }

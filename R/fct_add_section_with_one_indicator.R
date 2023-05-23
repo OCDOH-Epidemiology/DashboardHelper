@@ -31,7 +31,7 @@ add_section_with_one_indicator <- function(ns, indicator, description, bg_color 
             class = "w-100 h-100 d-flex flex-column justify-content-between",
             tags$h3(class = "text-center fs-3 fw-bold", HTML(x$finding)),
             tags$h5(class = "text-center mt-4", HTML(x$title)),
-            shinipsum::random_ggplotly("bar"),
+            plotly::plotlyOutput(ns(format_id(x$id))),
             tags$div(style = "font-size: .75rem;", class = "px-5", HTML(x$footnote))
           )
         )
