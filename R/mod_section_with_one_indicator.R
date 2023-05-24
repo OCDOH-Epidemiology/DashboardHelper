@@ -24,7 +24,7 @@ mod_section_with_one_indicator_server <- function(id, section_selection) {
     output$main <- shiny::renderUI({
       req(section_selection())
 
-      if (section_selection() != "Section with one indicator") {
+      if (section_selection() != "Section with One Indicator") {
         return()
       }
 
