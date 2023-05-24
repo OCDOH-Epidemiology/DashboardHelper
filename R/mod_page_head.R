@@ -24,10 +24,12 @@ mod_page_head_server <- function(id, section_selection) {
     output$page_head <- shiny::renderUI({
       req(section_selection())
 
+      # Return early if the dropdown selection is not equal to "Page Footer"
       if (section_selection() != "Page Header") {
         return()
       }
 
+      # Generate the HTML output
       tagList(
         shiny::textInput(ns("main_indicator"), tags$h3("Indicator", class = "m-0")),
         tags$div(
@@ -52,67 +54,105 @@ mod_page_head_server <- function(id, section_selection) {
     output$paragraph_inputs <- shiny::renderUI({
       req(input$num_paragraphs)
 
-      lapply(1:input$num_paragraphs, function(paragraph_number) {
-        shiny::textInput(ns(paste0("head_paragraph_", paragraph_number)), paste0("Paragraph ", paragraph_number, " Text"), width = "100%")
+      lapply(1:input$num_paragraphs, function(index) {
+        # Dynamically generate an id for the textInput
+        paragraph_input_id <- paste0("head-paragraph-", index)
+
+        # Dynamically create the label for the textInput
+        paragraph_input_label <- paste0("Paragraph ", index, " Text")
+
+        # Create a textInput field with the generated id and label
+        shiny::textInput(ns(paragraph_input_id), paragraph_input_label, width = "100%")
       })
     })
 
     output$button_inputs <- shiny::renderUI({
       req(input$num_buttons)
 
-      lapply(1:input$num_buttons, function(button_number) {
-        shiny::textInput(ns(paste0("head_button_", button_number)), paste0("Button ", button_number, " Text"), width = "100%")
+      lapply(1:input$num_buttons, function(index) {
+        # Dynamically generate an id for the textInput
+        button_input_id <- paste0("head-button-", index)
+
+        # Dynamically create the label for the textInput
+        button_input_label <- paste0("Button ", index, " Text")
+
+        # Create a textInput field with the generated id and label
+        shiny::textInput(ns(button_input_id), button_input_label, width = "100%")
       })
     })
 
     output$preview <- shiny::renderUI({
+      # Output the preview
       tagList(
         tags$h2("Preview"),
         add_page_head(
           indicator = input$main_indicator,
           description = lapply(1:input$num_paragraphs, function(paragraph_number) {
-            input[[paste0("head_paragraph_", paragraph_number)]]
+            input[[paste0("head-paragraph-", paragraph_number)]]
           }),
           sections = lapply(1:input$num_buttons, function(button_number) {
-            input[[paste0("head_button_", button_number)]]
+            input[[paste0("head-button-", button_number)]]
           })
         )
       )
     })
 
     output$generated_code <- shiny::renderPrint({
-      paragraphs_combined <- ""
-
-      for (paragraph_number in 1:input$num_paragraphs) {
-        paragraphs_combined <- paste0(paragraphs_combined, "    \"", input[[paste0("head_paragraph_", paragraph_number)]], "\"")
-
-        if (paragraph_number < max(input$num_paragraphs)) {
-          paragraphs_combined <- paste0(paragraphs_combined, ",\n")
-        }
-      }
-
-      buttons_combined <- ""
-
-      for (button_number in 1:input$num_buttons) {
-        buttons_combined <- paste0(buttons_combined, "    \"", input[[paste0("head_button_", button_number)]], "\"")
-
-        if (button_number < max(input$num_buttons)) {
-          buttons_combined <- paste0(buttons_combined, ",\n")
-        }
-      }
-
-      cat(
-        "add_page_head(",
-        paste0("  indicator = \"", input$main_indicator, "\","),
-        "  description = list(",
-        paragraphs_combined,
-        "  ),",
-        "  sections = list(",
-        buttons_combined,
-        "  )",
-        "),",
-        sep = "\n"
+      # Create an variable storing the opening part of the generated code
+      generated_code <- paste0(
+        "add_page_head(\n",
+        "  indicator = \"", input$main_indicator, "\",\n",
+        "  description = list(\n"
       )
+
+      # Loop through all paragraph inputs
+      for (index in 1:input$num_paragraphs) {
+        paragraph_text <- input[[paste0("head-paragraph-", index)]]
+
+        # Append the paragraph text to the generated code
+        generated_code <- paste0(generated_code, "    \"", paragraph_text, "\"")
+
+        # If the current index is not the final index, append a comma to the text
+        if (index < max(input$num_paragraphs)) {
+          generated_code <- paste0(generated_code, ",")
+        }
+
+        # Append a new line to the end of the generated code
+        generated_code <- paste0(generated_code, "\n")
+      }
+
+      # Close the description list and open the section list
+      generated_code <- paste0(
+        generated_code,
+        "  ),\n",
+        "  sections = list(\n"
+      )
+
+      # Loop through all button inputs
+      for (index in 1:input$num_buttons) {
+        button_text <- input[[paste0("head-button-", index)]]
+
+        # Append the button text to the generated code
+        generated_code <- paste0(generated_code, "    \"", button_text, "\"")
+
+        # If the current index is not the final index, append a comma to the text
+        if (index < max(input$num_buttons)) {
+          generated_code <- paste0(generated_code, ",")
+        }
+
+        # Append a new line to the end of the generated code
+        generated_code <- paste0(generated_code, "\n")
+      }
+
+      # Close the sections list and function call
+      generated_code <- paste0(
+        generated_code,
+        "  )\n",
+        "),"
+      )
+
+      # Output the finalized code
+      cat(generated_code)
     })
   })
 }

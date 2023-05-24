@@ -48,7 +48,7 @@ mod_page_foot_server <- function(id, section_selection) {
         # Dynamically generate an id for the text and url textInput fields
         footnote_text_id <- paste0("footnote-text-", index)
         footnote_url_id <- paste0("footnote-url-", index)
-        
+
         # Dynamically create the label for the text and url textInput fields
         footnote_text_label <- paste0("Footnote ", index, " Text")
         footnote_url_label <- paste0("Optional: Footnote ", index, " URL")
@@ -106,10 +106,7 @@ mod_page_foot_server <- function(id, section_selection) {
 
     output$generated_code <- renderPrint({
       # Create an variable storing the opening part of the generated code
-      generated_code <- paste0(
-        "add_page_foot(\n",
-        "  list(\n"
-      )
+      generated_code <- "add_page_foot(\n  list(\n"
 
       # Loop through all inputs to create the text for the generated code
       for (index in 1:input$num_footnotes) {
