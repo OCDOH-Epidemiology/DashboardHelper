@@ -32,8 +32,8 @@ mod_page_foot_server <- function(id, section_selection) {
       # Generate the HTML output
       tagList(
         shiny::sliderInput(ns("num_footnotes"), "How many footnotes are there?", 1, 15, 1, 1, width = "50%"),
-        tags$h3("If the footnote is not a link, leave the URL blank."),
         shiny::uiOutput(ns("footnote_inputs")),
+        tags$strong("*If the footnote is not a link, leave the URL blank."),
         shiny::uiOutput(ns("preview")),
         tags$br(),
         shiny::verbatimTextOutput(ns("generated_code"))
@@ -51,10 +51,10 @@ mod_page_foot_server <- function(id, section_selection) {
         
         # Dynamically create the label for the text and url textInput fields
         footnote_text_label <- paste0("Footnote ", index, " Text")
-        footnote_url_label <- paste0("Footnote ", index, " URL")
+        footnote_url_label <- paste0("Optional: Footnote ", index, " URL")
 
         tags$div(
-          class = "row",
+          class = "row m-1 p-1 border bg-light",
           tags$div(
             class = "col-md-6",
             # A text input for the footnote's text with a dynamically generated id
