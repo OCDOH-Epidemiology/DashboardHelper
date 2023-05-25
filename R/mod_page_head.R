@@ -29,7 +29,7 @@ mod_page_head_server <- function(id, section_selection) {
     observeEvent(input$num_paragraphs, {
       # Store the previous value of the textInputs for the paragraphs, pseudo-caching
       for (index in 1:10) {
-        paragraph_input_id <- paste0("paragraph-", index)
+        paragraph_input_id <- paste0("paragraph", index)
         previous_paragraphs[[letters[index]]] <- input[[paragraph_input_id]]
       }
     })
@@ -37,7 +37,7 @@ mod_page_head_server <- function(id, section_selection) {
     observeEvent(input$num_buttons, {
       # Store the previous value of the textInputs for the buttons, pseudo-caching
       for (index in 1:10) {
-        button_input_id <- paste0("button-", index)
+        button_input_id <- paste0("button", index)
         previous_buttons[[letters[index]]] <- input[[button_input_id]]
       }
     })
@@ -78,7 +78,7 @@ mod_page_head_server <- function(id, section_selection) {
 
       lapply(1:input$num_paragraphs, function(index) {
         # Dynamically generate an id for the textInput
-        paragraph_input_id <- paste0("paragraph-", index)
+        paragraph_input_id <- paste0("paragraph", index)
 
         # Dynamically create the label for the textInput
         paragraph_input_label <- paste0("Paragraph ", index, " Text")
@@ -93,7 +93,7 @@ mod_page_head_server <- function(id, section_selection) {
 
       lapply(1:input$num_buttons, function(index) {
         # Dynamically generate an id for the textInput
-        button_input_id <- paste0("button-", index)
+        button_input_id <- paste0("button", index)
 
         # Dynamically create the label for the textInput
         button_input_label <- paste0("Button ", index, " Text")
@@ -110,10 +110,10 @@ mod_page_head_server <- function(id, section_selection) {
         add_page_head(
           indicator = input$main_indicator,
           description = lapply(1:input$num_paragraphs, function(paragraph_number) {
-            input[[paste0("paragraph-", paragraph_number)]]
+            input[[paste0("paragraph", paragraph_number)]]
           }),
           sections = lapply(1:input$num_buttons, function(button_number) {
-            input[[paste0("button-", button_number)]]
+            input[[paste0("button", button_number)]]
           })
         )
       )
@@ -129,7 +129,7 @@ mod_page_head_server <- function(id, section_selection) {
 
       # Loop through all paragraph inputs
       for (index in 1:input$num_paragraphs) {
-        paragraph_text <- input[[paste0("paragraph-", index)]]
+        paragraph_text <- input[[paste0("paragraph", index)]]
 
         # Append the paragraph text to the generated code
         generated_code <- paste0(generated_code, "    \"", paragraph_text, "\"")
@@ -152,7 +152,7 @@ mod_page_head_server <- function(id, section_selection) {
 
       # Loop through all button inputs
       for (index in 1:input$num_buttons) {
-        button_text <- input[[paste0("button-", index)]]
+        button_text <- input[[paste0("button", index)]]
 
         # Append the button text to the generated code
         generated_code <- paste0(generated_code, "    \"", button_text, "\"")
