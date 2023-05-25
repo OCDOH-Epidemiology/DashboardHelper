@@ -21,6 +21,23 @@ mod_page_foot_server <- function(id, section_selection) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    #### Reactives ####
+    previous_text <- reactiveValues()
+    previous_urls <- reactiveValues()
+
+    #### Observers ####
+    observeEvent(input$num_footnotes, {
+      # Store the previous value of the textInputs for the text and urls, pseudo-chaching
+      for (index in 1:10) {
+        text_input_id <- paste0("footnote-text-", index)
+        url_input_id <- paste0("footnote-url-", index)
+
+        previous_text[[letters[index]]] <- input[[text_input_id]]
+        previous_urls[[letters[index]]] <- input[[url_input_id]]
+      }
+    })
+
+    #### Outputs ####
     output$page_foot <- shiny::renderUI({
       req(section_selection())
 
@@ -46,8 +63,8 @@ mod_page_foot_server <- function(id, section_selection) {
       # Create a list based on the value of the slider input
       lapply(1:input$num_footnotes, function(index) {
         # Dynamically generate an id for the text and url textInput fields
-        footnote_text_id <- paste0("footnote-text-", index)
-        footnote_url_id <- paste0("footnote-url-", index)
+        text_input_id <- paste0("footnote-text-", index)
+        url_input_id <- paste0("footnote-url-", index)
 
         # Dynamically create the label for the text and url textInput fields
         footnote_text_label <- paste0("Footnote ", index, " Text")
@@ -58,12 +75,12 @@ mod_page_foot_server <- function(id, section_selection) {
           tags$div(
             class = "col-md-6",
             # A text input for the footnote's text with a dynamically generated id
-            shiny::textInput(ns(footnote_text_id), footnote_text_label, width = "100%")
+            shiny::textInput(ns(text_input_id), footnote_text_label, width = "100%", value = previous_text[[letters[index]]])
           ),
           tags$div(
             class = "col-md-6",
             # A text input for the footnote's URL with a dynamically generated id
-            shiny::textInput(ns(footnote_url_id), footnote_url_label, width = "100%")
+            shiny::textInput(ns(url_input_id), footnote_url_label, width = "100%", value = previous_urls[[letters[index]]])
           )
         )
       })
