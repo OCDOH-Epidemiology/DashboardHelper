@@ -57,15 +57,41 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     observeEvent(input$num_graphs, {
       # Store the values for each graph input block
       for (index in 1:MAX_GRAPHS) {
-        previous_graphs$id[[letters[index]]] <- input[[paste0("id", index)]]
-        previous_graphs$finding[[letters[index]]] <- input[[paste0("finding", index)]]
-        previous_graphs$title[[letters[index]]] <- input[[paste0("title", index)]]
-        previous_graphs$footnote[[letters[index]]] <- input[[paste0("footnote", index)]]
-        previous_graphs$source[[letters[index]]] <- input[[paste0("data_source", index)]]
-        previous_graphs$axis_title[[letters[index]]] <- input[[paste0("y_title", index)]]
-        previous_graphs$axis_format[[letters[index]]] <- input[[paste0("y_format", index)]]
-        previous_graphs$hover_format[[letters[index]]] <- input[[paste0("y_hover", index)]]
+        rv_graph_data$id[[letters[index]]] <- input[[paste0("id", index)]]
+        rv_graph_data$finding[[letters[index]]] <- input[[paste0("finding", index)]]
+        rv_graph_data$title[[letters[index]]] <- input[[paste0("title", index)]]
+        rv_graph_data$footnote[[letters[index]]] <- input[[paste0("footnote", index)]]
+        rv_graph_data$source[[letters[index]]] <- input[[paste0("data_source", index)]]
+        rv_graph_data$axis_title[[letters[index]]] <- input[[paste0("y_title", index)]]
+        rv_graph_data$axis_format[[letters[index]]] <- input[[paste0("y_format", index)]]
+        rv_graph_data$hover_format[[letters[index]]] <- input[[paste0("y_hover", index)]]
       }
+    })
+
+    observe({
+      req(input$num_graphs)
+
+      # Generate the graphs with cars data
+      lapply(1:input$num_graphs, function(index) {
+        id <- req(format_id(input[[paste0("id", index)]]))
+        local({
+          output[[id]] <- plotly::renderPlotly({
+            cars %>%
+              dplyr::group_by(speed) %>%
+              dplyr::summarise(dist = sum(dist)) %>%
+              plotly::plot_ly(x = ~speed, y = ~ dist * 10, type = "bar") %>%
+              plotly::layout(
+                xaxis = list(title = "", categoryorder = "trace", fixedrange = TRUE),
+                yaxis = list(
+                  title = input[[paste0("y_title-", index)]],
+                  tickformat = input[[paste0("y_format-", index)]],
+                  hoverformat = input[[paste0("y_hover-", index)]],
+                  fixedrange = TRUE
+                )
+              )
+          })
+        })
+      })
     })
 
     #### Outputs ####
@@ -78,7 +104,8 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
 
       tagList(
         tags$div(
-          shiny::textInput(ns("main_finding"), tags$h3("Main Finding", class = "m-0")),
+          shiny::textInput(ns("main_indicator"), tags$h3("Main Indicator", class = "m-0")),
+        shiny::textInput(ns("main_finding"), tags$h3("Main Finding", class = "m-0")),
           shiny::selectInput(ns("bg_color"), "Background color:", c("bg-water", "bg-white")),
           shiny::sliderInput(ns("num_indicators"), "Number of indicators:", 1, MAX_INDICATORS, 1, width = "100%"),
           tags$div(
@@ -215,23 +242,21 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     })
 
     output$preview <- shiny::renderUI({
-      # Necessary delay to ensure that graph inputs are generated before rendering the graphs
-      Sys.sleep(.1)
-
       tagList(
         add_body(
-          
-        )
-        add_section_with_one_indicator(
           ns = ns,
-          indicator = input$main_indicator,
-          description = lapply(1:input$num_paragraphs, function(index) {
-            input[[paste0("paragraph", index)]]
+          main_indicator = input$main_indicator,
+          sub_indicators = lapply(1:input$num_indicators, function(outer_index) {
+            list(
+              indicator = input[[paste0("indicator", outer_index)]],
+              description = lapply(1:input[[paste0("num_paragraphs", outer_index)]], function(inner_index) {
+                input[[paste0("paragraph_", letters[outer_index], inner_index)]]
+              })
+            )
           }),
           bg_color = input$bg_color,
           main_finding = input$main_finding,
           graphs = lapply(1:input$num_graphs, function(index) {
-            req(input[[paste0("id", index)]])
             list(
               id = input[[paste0("id", index)]],
               finding = input[[paste0("finding", index)]],
