@@ -107,7 +107,7 @@ mod_page_head_server <- function(id, section_selection) {
       # Output the preview
       tagList(
         tags$h2("Preview"),
-        add_page_head(
+        add_head(
           indicator = input$main_indicator,
           description = lapply(1:input$num_paragraphs, function(paragraph_number) {
             input[[paste0("paragraph", paragraph_number)]]
@@ -122,7 +122,7 @@ mod_page_head_server <- function(id, section_selection) {
     output$generated_code <- shiny::renderPrint({
       # Create an variable storing the opening part of the generated code
       generated_code <- paste0(
-        "add_page_head(\n",
+        "add_head(\n",
         "  indicator = \"", input$main_indicator, "\",\n",
         "  description = list(\n"
       )

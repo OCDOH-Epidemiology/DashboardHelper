@@ -1,4 +1,4 @@
-#' add_section_with_multiple_indicators
+#' add_body
 #'
 #' @description A function which creates a section. The section contains multiple indicators, each with a description and a dynamic number of graphs.
 #'
@@ -13,7 +13,7 @@
 #'            Each list must contain an id, and can contain a finding, title, and footnote
 #'
 #' @noRd
-add_section_with_multiple_indicators <- function(ns, indicator, sub_indicators = list(), bg_color = "bg-white", main_finding = "", ...) {
+add_body <- function(ns, indicator, sub_indicators = list(), bg_color = "bg-white", main_finding = "", ...) {
     tags$section(
         id = gsub(" ", "-", tolower(indicator)),
         class = paste0(bg_color, " px-5 py-3"),

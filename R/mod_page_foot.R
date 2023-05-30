@@ -14,7 +14,7 @@ mod_page_foot_ui <- function(id) {
   )
 }
 
-#' add_page_foot Server Functions
+#' add_foot Server Functions
 #'
 #' @noRd
 mod_page_foot_server <- function(id, section_selection) {
@@ -115,7 +115,7 @@ mod_page_foot_server <- function(id, section_selection) {
       # Output the preview
       tagList(
         tags$h2("Preview"),
-        add_page_foot(
+        add_foot(
           footnote_list
         )
       )
@@ -123,7 +123,7 @@ mod_page_foot_server <- function(id, section_selection) {
 
     output$generated_code <- renderPrint({
       # Create an variable storing the opening part of the generated code
-      generated_code <- "add_page_foot(\n  list(\n"
+      generated_code <- "add_foot(\n  list(\n"
 
       # Loop through all inputs to create the text for the generated code
       for (index in 1:input$num_footnotes) {

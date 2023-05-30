@@ -24,6 +24,7 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     # Global reactive values for the server
     MAX_INDICATORS <- 5
     MAX_PARAGRAPHS <- 5
+    MAX_GRAPHS <- 5
 
     # List of observeEvents
     obsList <- list()
@@ -32,7 +33,7 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     rv_indicators <- reactiveValues()
     rv_num_paragraphs <- reactiveValues()
     rv_paragraphs <- reactiveValues()
-    previous_graphs <- reactiveValues()
+    rv_graph_data <- reactiveValues()
 
     #### Observers ####
     observeEvent(input$num_indicators, {
@@ -53,6 +54,20 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
       }
     })
 
+    observeEvent(input$num_graphs, {
+      # Store the values for each graph input block
+      for (index in 1:MAX_GRAPHS) {
+        previous_graphs$id[[letters[index]]] <- input[[paste0("id", index)]]
+        previous_graphs$finding[[letters[index]]] <- input[[paste0("finding", index)]]
+        previous_graphs$title[[letters[index]]] <- input[[paste0("title", index)]]
+        previous_graphs$footnote[[letters[index]]] <- input[[paste0("footnote", index)]]
+        previous_graphs$source[[letters[index]]] <- input[[paste0("data_source", index)]]
+        previous_graphs$axis_title[[letters[index]]] <- input[[paste0("y_title", index)]]
+        previous_graphs$axis_format[[letters[index]]] <- input[[paste0("y_format", index)]]
+        previous_graphs$hover_format[[letters[index]]] <- input[[paste0("y_hover", index)]]
+      }
+    })
+
     #### Outputs ####
     output$main <- shiny::renderUI({
       req(section_selection())
@@ -69,7 +84,15 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
           tags$div(
             class = "row g-3",
             shiny::uiOutput(ns("indicator_inputs"))
-          )
+          ),
+          shiny::sliderInput(ns("num_graphs"), "Number of graphs:", 1, MAX_GRAPHS, 1, width = "100%"),
+          shiny::uiOutput(ns("graph_inputs")),
+          tags$h2("Preview"),
+          shiny::uiOutput(ns("preview")),
+          tags$h2("UI Code"),
+          shiny::verbatimTextOutput(ns("generated_code_UI")),
+          tags$h2("Server Code"),
+          shiny::verbatimTextOutput(ns("generated_code_Server"))
         )
       )
     })
@@ -146,6 +169,77 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
             )
           )
         })
+      )
+    })
+
+    output$graph_inputs <- shiny::renderUI({
+      req(input$num_graphs)
+
+      lapply(1:input$num_graphs, function(index) {
+        tags$div(
+          class = "row gx-3 border my-1",
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("id", index)), paste0("Graph ", index, " ID"), width = "100%", value = ifelse(is.null(rv_graph_data$id[[letters[index]]]), letters[index], rv_graph_data$id[[letters[index]]]))
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textAreaInput(ns(paste0("finding", index)), paste0("Graph ", index, " Finding"), width = "100%", value = rv_graph_data$finding[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textAreaInput(ns(paste0("title", index)), paste0("Graph ", index, " Title"), width = "100%", value = rv_graph_data$title[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textAreaInput(ns(paste0("footnote", index)), paste0("Graph ", index, " Footnote"), width = "100%", value = rv_graph_data$footnote[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("data_source", index)), paste0("Graph ", index, " Data Source"), width = "100%", value = rv_graph_data$source[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_title", index)), paste0("Graph ", index, " Y-Axis Title"), width = "100%", value = rv_graph_data$axis_title[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_format", index)), paste0("Graph ", index, " Y-Axis Format"), width = "100%", value = rv_graph_data$axis_format[[letters[index]]])
+          ),
+          tags$div(
+            class = "col-3",
+            shiny::textInput(ns(paste0("y_hover", index)), paste0("Graph ", index, " Hover Format"), width = "100%", value = ifelse(is.null(rv_graph_data$hover_format[[letters[index]]]), ".1f", rv_graph_data$hover_format[[letters[index]]]))
+          )
+        )
+      })
+    })
+
+    output$preview <- shiny::renderUI({
+      # Necessary delay to ensure that graph inputs are generated before rendering the graphs
+      Sys.sleep(.1)
+
+      tagList(
+        add_body(
+          
+        )
+        add_section_with_one_indicator(
+          ns = ns,
+          indicator = input$main_indicator,
+          description = lapply(1:input$num_paragraphs, function(index) {
+            input[[paste0("paragraph", index)]]
+          }),
+          bg_color = input$bg_color,
+          main_finding = input$main_finding,
+          graphs = lapply(1:input$num_graphs, function(index) {
+            req(input[[paste0("id", index)]])
+            list(
+              id = input[[paste0("id", index)]],
+              finding = input[[paste0("finding", index)]],
+              title = input[[paste0("title", index)]],
+              footnote = input[[paste0("footnote", index)]]
+            )
+          })
+        )
       )
     })
   })
