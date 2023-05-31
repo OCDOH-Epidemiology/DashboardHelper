@@ -83,9 +83,9 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
               plotly::layout(
                 xaxis = list(title = "", categoryorder = "trace", fixedrange = TRUE),
                 yaxis = list(
-                  title = input[[paste0("y_title-", index)]],
-                  tickformat = input[[paste0("y_format-", index)]],
-                  hoverformat = input[[paste0("y_hover-", index)]],
+                  title = input[[paste0("y_title", index)]],
+                  tickformat = input[[paste0("y_format", index)]],
+                  hoverformat = input[[paste0("y_hover", index)]],
                   fixedrange = TRUE
                 )
               )
@@ -106,7 +106,7 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
       tagList(
         tags$div(
           shiny::textInput(ns("main_indicator"), tags$h3("Main Indicator", class = "m-0")),
-        shiny::textInput(ns("main_finding"), tags$h3("Main Finding", class = "m-0")),
+          shiny::textInput(ns("main_finding"), tags$h3("Main Finding", class = "m-0")),
           shiny::selectInput(ns("bg_color"), "Background color:", c("bg-water", "bg-white")),
           shiny::sliderInput(ns("num_indicators"), "Number of indicators:", 1, MAX_INDICATORS, 1, width = "100%"),
           tags$div(
@@ -243,28 +243,42 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     })
 
     output$preview <- shiny::renderUI({
+      req(input$num_indicators)
+      req(input$num_graphs)
+      # Necessary delay to ensure that graph inputs are generated before rendering the graphs
+      # print("Render preview!")
+      # Sys.sleep(2)
+
+      sub_indicators <- lapply(1:input$num_indicators, function(outer_index) {
+        req(input[[paste0("num_paragraphs", outer_index)]])
+
+        list(
+          indicator = input[[paste0("indicator", outer_index)]],
+          description = lapply(1:input[[paste0("num_paragraphs", outer_index)]], function(inner_index) {
+            input[[paste0("paragraph_", letters[outer_index], inner_index)]]
+          })
+        )
+      })
+
+      graphs <- lapply(1:input$num_graphs, function(index) {
+        req(input[[paste0("id", index)]])
+
+        list(
+          id = input[[paste0("id", index)]],
+          finding = input[[paste0("finding", index)]],
+          title = input[[paste0("title", index)]],
+          footnote = input[[paste0("footnote", index)]]
+        )
+      })
+
       tagList(
         add_body(
           ns = ns,
           main_indicator = input$main_indicator,
-          sub_indicators = lapply(1:input$num_indicators, function(outer_index) {
-            list(
-              indicator = input[[paste0("indicator", outer_index)]],
-              description = lapply(1:input[[paste0("num_paragraphs", outer_index)]], function(inner_index) {
-                input[[paste0("paragraph_", letters[outer_index], inner_index)]]
-              })
-            )
-          }),
+          sub_indicators = sub_indicators,
           bg_color = input$bg_color,
           main_finding = input$main_finding,
-          graphs = lapply(1:input$num_graphs, function(index) {
-            list(
-              id = input[[paste0("id", index)]],
-              finding = input[[paste0("finding", index)]],
-              title = input[[paste0("title", index)]],
-              footnote = input[[paste0("footnote", index)]]
-            )
-          })
+          graphs = graphs
         )
       )
     })
