@@ -336,7 +336,7 @@ mod_body_server <- function(id, section_selection) {
       }
 
       cat(
-        paste0("# ", input$main_indicator, " section"),
+        paste0("# ", input$main_indicator, " UI"),
         "add_body(",
         "  ns = ns,",
         paste0("  main_indicator = \"", input$main_indicator, "\","),
@@ -348,7 +348,7 @@ mod_body_server <- function(id, section_selection) {
         "  list(",
         graphs,
         "  )",
-        ")",
+        "),",
         sep = "\n"
       )
     })
@@ -356,11 +356,14 @@ mod_body_server <- function(id, section_selection) {
     output$generated_code_Server <- renderPrint({
       module_calls <- NULL
       for (index in 1:input$num_graphs) {
+        server_call_name <- stringr::str_to_title(stringr::str_replace_all(input[[paste0("id", index)]], c("_" = " ", "-" = " ")))
+
         module_calls <- paste0(
           module_calls,
+          "# ", server_call_name, " Server\n",
           "mod_add_graph_server(\n",
           "  id = \"", format_id(input[[paste0("id", index)]]), "\",\n",
-          "  data_in = \"", input[[paste0("data_source", index)]], "\",\n",
+          "  data_in = ", input[[paste0("data_source", index)]], ",\n",
           "  y_title = \"", input[[paste0("y_title", index)]], "\",\n",
           "  y_format = \"", input[[paste0("y_format", index)]], "\",\n",
           "  y_hover = \"", input[[paste0("y_hover", index)]], "\"\n",
