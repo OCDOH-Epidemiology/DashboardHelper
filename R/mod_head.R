@@ -46,8 +46,8 @@ mod_page_head_server <- function(id, section_selection) {
     output$page_head <- shiny::renderUI({
       req(section_selection())
 
-      # Return early if the dropdown selection is not equal to "Page Footer"
-      if (section_selection() != "Page Header") {
+      # Return early if the dropdown selection is not equal to "Head Section"
+      if (section_selection() != "Head Section") {
         return()
       }
 

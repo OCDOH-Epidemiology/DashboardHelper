@@ -13,7 +13,7 @@ app_ui <- function(request) {
       theme = bslib::bs_theme(version = 5),
       tags$section(
         class = "p-4",
-        shiny::selectInput("section_selection", "What code do you want to generate?", c("New Data Set", "Page Header", "Page Footer", "Section with One Indicator", "Section with Multiple Indicators")),
+        shiny::selectInput("section_selection", "What code do you want to generate?", c("New Data Set", "Head Section", "Foot Section", "Section with One Indicator", "Body Section")),
         mod_new_data_set_ui("new-data"),
         mod_page_head_ui("page-head"),
         mod_page_foot_ui("page-foot"),

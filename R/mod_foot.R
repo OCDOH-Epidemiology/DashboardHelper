@@ -41,8 +41,8 @@ mod_page_foot_server <- function(id, section_selection) {
     output$page_foot <- shiny::renderUI({
       req(section_selection())
 
-      # Return early if the dropdown selection is not equal to "Page Footer"
-      if (section_selection() != "Page Footer") {
+      # Return early if the dropdown selection is not equal to "Foot Section"
+      if (section_selection() != "Foot Section") {
         return()
       }
 

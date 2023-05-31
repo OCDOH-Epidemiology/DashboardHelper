@@ -98,7 +98,8 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
     output$main <- shiny::renderUI({
       req(section_selection())
 
-      if (section_selection() != "Section with Multiple Indicators") {
+      # Return early if the dropdown selection is not equal to "Body Section"
+      if (section_selection() != "Body Section") {
         return()
       }
 
