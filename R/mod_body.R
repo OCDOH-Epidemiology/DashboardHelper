@@ -282,6 +282,100 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
         )
       )
     })
+
+    output$generated_code_UI <- renderPrint({
+      sub_indicators <- ""
+      for (outer_index in 1:input$num_indicators) {
+        req(input[[paste0("num_paragraphs", outer_index)]])
+
+        sub_indicators <- paste0(
+          sub_indicators,
+          "    list(\n",
+          "      indicator = \"", input[[paste0("indicator", outer_index)]], "\",\n",
+          "      description = list(\n"
+        )
+
+        for (inner_index in 1:input[[paste0("num_paragraphs", outer_index)]]) {
+          sub_indicators <- paste0(
+            sub_indicators,
+            "        \"", input[[paste0("paragraph_", letters[outer_index], inner_index)]], "\""
+          )
+
+
+          if (inner_index < input[[paste0("num_paragraphs", outer_index)]]) {
+            sub_indicators <- paste0(sub_indicators, ",\n")
+          }
+        }
+
+        sub_indicators <- paste0(
+          sub_indicators, "\n",
+          "      )\n",
+          "    )"
+        )
+
+        if (outer_index < input$num_indicators) {
+          sub_indicators <- paste0(sub_indicators, ",\n")
+        }
+      }
+
+      graphs <- ""
+      for (index in 1:input$num_graphs) {
+        graphs <- paste0(
+          graphs,
+          "    list(\n",
+          "      id = \"", format_id(input[[paste0("id", index)]]), "\",\n",
+          "      finding = \"", input[[paste0("finding", index)]], "\",\n",
+          "      title = \"", input[[paste0("title", index)]], "\",\n",
+          "      footnote = \"", input[[paste0("footnote", index)]], "\"\n",
+          "    )"
+        )
+
+        if (index < input$num_graphs) {
+          graphs <- paste0(graphs, ",\n")
+        }
+      }
+
+      cat(
+        paste0("# ", input$main_indicator, " section"),
+        "add_body(",
+        "  ns = ns,",
+        paste0("  main_indicator = \"", input$main_indicator, "\","),
+        paste0("  sub_indicators = list("),
+        sub_indicators,
+        "  ),",
+        paste0("  bg_color = \"", input$bg_color, "\","),
+        paste0("  main_finding = \"", input$main_finding, "\","),
+        "  list(",
+        graphs,
+        "  )",
+        ")",
+        sep = "\n"
+      )
+    })
+
+    output$generated_code_Server <- renderPrint({
+      module_calls <- NULL
+      for (index in 1:input$num_graphs) {
+        module_calls <- paste0(
+          module_calls,
+          "mod_add_graph_server(\n",
+          "  id = \"", format_id(input[[paste0("id", index)]]), "\",\n",
+          "  data_in = \"", input[[paste0("data_source", index)]], "\",\n",
+          "  y_title = \"", input[[paste0("y_title", index)]], "\",\n",
+          "  y_format = \"", input[[paste0("y_format", index)]], "\",\n",
+          "  y_hover = \"", input[[paste0("y_hover", index)]], "\"\n",
+          ")"
+        )
+
+        if (index < input$num_graphs) {
+          module_calls <- paste0(module_calls, "\n\n")
+        }
+      }
+
+      cat(
+        module_calls
+      )
+    })
   })
 }
 
