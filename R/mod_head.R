@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_page_head_ui <- function(id) {
+mod_head_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shiny::uiOutput(ns("page_head"))
@@ -17,7 +17,7 @@ mod_page_head_ui <- function(id) {
 #' page_head Server Functions
 #'
 #' @noRd
-mod_page_head_server <- function(id, section_selection) {
+mod_head_server <- function(id, section_selection) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -180,7 +180,7 @@ mod_page_head_server <- function(id, section_selection) {
 }
 
 ## To be copied in the UI
-# mod_page_head_ui("page-head")
+# mod_head_ui("head")
 
 ## To be copied in the server
-# mod_page_head_server("page-head")
+# mod_head_server("head")

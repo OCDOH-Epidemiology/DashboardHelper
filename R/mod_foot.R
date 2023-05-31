@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_page_foot_ui <- function(id) {
+mod_foot_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shiny::uiOutput(ns("page_foot"))
@@ -17,7 +17,7 @@ mod_page_foot_ui <- function(id) {
 #' add_foot Server Functions
 #'
 #' @noRd
-mod_page_foot_server <- function(id, section_selection) {
+mod_foot_server <- function(id, section_selection) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -169,7 +169,7 @@ mod_page_foot_server <- function(id, section_selection) {
 }
 
 ## To be copied in the UI
-# mod_page_foot_ui("page-foot")
+# mod_foot_ui("foot")
 
 ## To be copied in the server
-# mod_page_foot_server("page-foot")
+# mod_foot_server("foot")

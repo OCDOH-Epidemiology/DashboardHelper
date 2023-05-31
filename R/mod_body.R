@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_section_with_multiple_indicators_ui <- function(id) {
+mod_body_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shiny::uiOutput(ns("main"))
@@ -17,7 +17,7 @@ mod_section_with_multiple_indicators_ui <- function(id) {
 #' section_with_multiple_indicators Server Functions
 #'
 #' @noRd
-mod_section_with_multiple_indicators_server <- function(id, section_selection) {
+mod_body_server <- function(id, section_selection) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -380,7 +380,7 @@ mod_section_with_multiple_indicators_server <- function(id, section_selection) {
 }
 
 ## To be copied in the UI
-# mod_section_with_multiple_indicators_ui("multi-indicator")
+# mod_body_ui("body")
 
 ## To be copied in the server
-# mod_section_with_multiple_indicators_server("multi-indicator")
+# mod_body_server("body")
