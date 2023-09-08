@@ -1,4 +1,4 @@
-#' page_head UI Function
+#' head_section UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -10,40 +10,43 @@
 mod_head_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shiny::uiOutput(ns("page_head"))
+    shiny::uiOutput(ns("head_section"))
   )
 }
 
-#' page_head Server Functions
+#' head_section Server Functions
 #'
 #' @noRd
 mod_head_server <- function(id, section_selection) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    #### Default Values ####
+    MAX_PARAGRAPHS = 5
+    MAX_BUTTONS = 5
+
     #### Reactives ####
-    previous_paragraphs <- reactiveValues()
-    previous_buttons <- reactiveValues()
+    previous_values <- reactiveValues()
 
     #### Observers ####
     observeEvent(input$num_paragraphs, {
       # Store the previous value of the textInputs for the paragraphs, pseudo-caching
-      for (index in 1:10) {
-        paragraph_input_id <- paste0("paragraph", index)
-        previous_paragraphs[[letters[index]]] <- input[[paragraph_input_id]]
+      for (index in 1:MAX_PARAGRAPHS) {
+        input_id <- paste0("paragraph", index)
+        previous_values[[input_id]] <- input[[input_id]]
       }
     })
 
     observeEvent(input$num_buttons, {
       # Store the previous value of the textInputs for the buttons, pseudo-caching
-      for (index in 1:10) {
-        button_input_id <- paste0("button", index)
-        previous_buttons[[letters[index]]] <- input[[button_input_id]]
+      for (index in 1:MAX_PARAGRAPHS) {
+        input_id <- paste0("button", index)
+        previous_values[[input_id]] <- input[[input_id]]
       }
     })
 
     #### Outputs ####
-    output$page_head <- shiny::renderUI({
+    output$head_section <- shiny::renderUI({
       req(section_selection())
 
       # Return early if the dropdown selection is not equal to "Head Section"
@@ -58,12 +61,12 @@ mod_head_server <- function(id, section_selection) {
           class = "row",
           tags$div(
             class = "col-md-6",
-            shiny::sliderInput(ns("num_paragraphs"), "How many paragraphs should be in the header?", 1, 10, 1, 1, width = "100%"),
+            shiny::sliderInput(ns("num_paragraphs"), "How many paragraphs should be in the header?", 1, MAX_PARAGRAPHS, 1, 1, width = "100%"),
             shiny::uiOutput(ns("paragraph_inputs"))
           ),
           tags$div(
             class = "col-md-6",
-            shiny::sliderInput(ns("num_buttons"), "How many section buttons are there?", 1, 10, 1, 1, width = "100%"),
+            shiny::sliderInput(ns("num_buttons"), "How many section buttons are there?", 1, MAX_PARAGRAPHS, 1, 1, width = "100%"),
             shiny::uiOutput(ns("button_inputs"))
           )
         ),
@@ -78,13 +81,13 @@ mod_head_server <- function(id, section_selection) {
 
       lapply(1:input$num_paragraphs, function(index) {
         # Dynamically generate an id for the textInput
-        paragraph_input_id <- paste0("paragraph", index)
+        input_id <- paste0("paragraph", index)
 
         # Dynamically create the label for the textInput
-        paragraph_input_label <- paste0("Paragraph ", index, " Text")
+        input_label <- paste0("Paragraph ", index, " Text")
 
         # Create a textInput field with the generated id and label
-        shiny::textInput(ns(paragraph_input_id), paragraph_input_label, width = "100%", value = previous_paragraphs[[letters[index]]])
+        shiny::textInput(ns(input_id), input_label, width = "100%", value = previous_values[[input_id]])
       })
     })
 
@@ -93,13 +96,13 @@ mod_head_server <- function(id, section_selection) {
 
       lapply(1:input$num_buttons, function(index) {
         # Dynamically generate an id for the textInput
-        button_input_id <- paste0("button", index)
+        input_id <- paste0("button", index)
 
         # Dynamically create the label for the textInput
-        button_input_label <- paste0("Button ", index, " Text")
+        input_label <- paste0("Button ", index, " Text")
 
         # Create a textInput field with the generated id and label
-        shiny::textInput(ns(button_input_id), button_input_label, width = "100%", value = previous_buttons[[letters[index]]])
+        shiny::textInput(ns(input_id), input_label, width = "100%", value = previous_values[[input_id]])
       })
     })
 
@@ -107,12 +110,14 @@ mod_head_server <- function(id, section_selection) {
       # Output the preview
       tagList(
         tags$h2("Preview"),
-        add_head(
+        add_header(
           indicator = input$main_indicator,
           description = lapply(1:input$num_paragraphs, function(paragraph_number) {
+            # Get the value of each paragraph input
             input[[paste0("paragraph", paragraph_number)]]
           }),
           sections = lapply(1:input$num_buttons, function(button_number) {
+            # Get the value of each button input
             input[[paste0("button", button_number)]]
           })
         )
@@ -122,7 +127,7 @@ mod_head_server <- function(id, section_selection) {
     output$generated_code <- shiny::renderPrint({
       # Create an variable storing the opening part of the generated code
       generated_code <- paste0(
-        "add_head(\n",
+        "add_header(\n",
         "  indicator = \"", input$main_indicator, "\",\n",
         "  description = list(\n"
       )

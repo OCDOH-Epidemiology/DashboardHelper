@@ -21,7 +21,7 @@
 golem::fill_desc(
   pkg_name = "DashboardHelper", # The Name of the package containing the App
   pkg_title = "PKG_TITLE", # The Title of the package containing the App
-  pkg_description = "PKG_DESC.", # The Description of the package containing the App
+  pkg_description = "A dashboard to help generate code for updating the Orange County Health Equity Dashboard", # The Description of the package containing the App
   author_first_name = "Samuel", # Your First Name
   author_last_name = "Rubin", # Your Last Name
   author_email = "srubin@orangecountygov.com", # Your Email

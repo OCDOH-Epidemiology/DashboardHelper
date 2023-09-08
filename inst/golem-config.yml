@@ -5,5 +5,4 @@ default:
 production:
   app_prod: yes
 dev:
-  golem_wd: \\datastores02/healthpubglobal/1887Building/Communicable Disease/COVID
-    2019 Novel Coronavirus/Charts Graphs and Data/Sam/R Projects/DashboardHelper
+  golem_wd: !expr golem::pkg_path()

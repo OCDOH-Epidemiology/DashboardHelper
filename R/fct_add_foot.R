@@ -5,7 +5,7 @@
 #' @return The return value, if any, from executing the function.
 #'
 #' @noRd
-add_foot <- function(footnotes = list()) {
+add_footer <- function(footnotes = list()) {
   # Quit early if no footnotes sent in
   if (length(footnotes) == 0) {
     return()

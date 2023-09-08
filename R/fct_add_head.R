@@ -5,7 +5,7 @@
 #' @return The return value, if any, from executing the function.
 #'
 #' @noRd
-add_head <- function(indicator, description = list(), sections = list()) {
+add_header <- function(indicator, description = list(), sections = list()) {
   tags$section(
     class = "position-relative px-5 py-3",
     style = "background-color: rgb(215, 236, 250); color: rgb(64, 81, 78);",
