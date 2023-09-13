@@ -40,6 +40,10 @@ sup {
   color: #40514e;
 }
 
+.box .box-header {
+  height: 35px;
+}
+
 .footnote-link {
   color: #d7ecfa;
 }

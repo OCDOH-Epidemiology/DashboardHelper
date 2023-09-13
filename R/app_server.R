@@ -19,10 +19,11 @@ app_server <- function(input, output, session) {
   output$head <- renderUI({
     shinydashboard::box(
       id = "head_section",
-      title = "Top Section Input",
+      title = "Page Header Input",
       status = "warning",
       solidHeader = TRUE,
       collapsible = TRUE,
+      collapsed = TRUE,
       width = "100%",
       shiny::textInput("head_indicator", label = "Main Indicator"),
       tags$div(
@@ -44,6 +45,98 @@ app_server <- function(input, output, session) {
           })
         )
       )
+    )
+  })
+
+  output$body <- renderUI({
+    lapply(1:MAX_BODY_SECTIONS, function(i) { # For each section
+      observeEvent(input[[paste0("num-subindicators-", i)]], { # Create an observeEvent call for the slider in that section
+        num_subindicators <- input[[paste0("num-subindicators-", i)]] # Store the value of the slider in the section
+
+        for (j in 1:MAX_BODY_SECTION_SUBINDICATORS) { # For each subindicator block
+          if (j <= num_subindicators) {
+            shinyjs::showElement(paste0("subindicator-block-", i, j), anim = TRUE, time = 0.5) # Show the subindicator block
+          } else {
+            shinyjs::hideElement(paste0("subindicator-block-", i, j), anim = TRUE, time = 0.5) # Hide the subindicator block
+          }
+        }
+      })
+    })
+
+    lapply(1:MAX_BODY_SECTIONS, function(i) { # For each section
+      lapply(1:MAX_BODY_SECTION_SUBINDICATORS, function(j) { # For each subindicator block
+        observeEvent(input[[paste0("subindicator-paragraph-slider-", i, j)]], { # Create an observeEvent call for the slider in that subindicator block
+          num_subindicator_paragraphs <- input[[paste0("subindicator-paragraph-slider-", i, j)]]
+
+          for (k in 1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS) { # For each subindicator block
+            if (k <= num_subindicator_paragraphs) {
+              shinyjs::showElement(paste0("subindicator-paragraph-", i, j, k), anim = TRUE, time = 0.5) # Show the subindicator paragraph textAreaInput
+            } else {
+              shinyjs::hideElement(paste0("subindicator-paragraph-", i, j, k), anim = TRUE, time = 0.5) # Hide the subindicator paragraph textAreaInput
+            }
+          }
+        })
+      })
+    })
+
+    shiny::tagList(
+      shiny::sliderInput("num_sections", "Number of sections", 1, MAX_BODY_SECTIONS, 1, 1, width = "100%"),
+      shinydashboard::box(
+        id = "body_section",
+        title = "Content Input",
+        status = "warning",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        collapsed = TRUE,
+        width = 12,
+        lapply(1:MAX_BODY_SECTIONS, function(i) {
+          shinyjs::hidden(
+            tags$div(
+              id = paste0("section-", i),
+              shinydashboard::box(
+                title = paste0("Section ", i),
+                status = "warning",
+                solidHeader = TRUE,
+                collapsible = TRUE,
+                collapsed = TRUE,
+                width = 12,
+                shiny::sliderInput(paste0("num-subindicators-", i), "Number of sub-indicators", 1, MAX_BODY_SECTION_SUBINDICATORS, 1, 1),
+                tags$div(
+                  class = "row",
+                  lapply(1:MAX_BODY_SECTION_SUBINDICATORS, function(j) {
+                    tags$div(
+                      id = paste0("subindicator-block-", i, j),
+                      class = "col-md-6",
+                      shinydashboard::box(
+                        status = "warning",
+                        solidHeader = TRUE,
+                        width = 12,
+                        shiny::textInput(paste0("subindicator-", i, j), "Indicator"),
+                        shiny::sliderInput(paste0("subindicator-paragraph-slider-", i, j), "Number of paragraphs", 1, MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, 1, 1),
+                        lapply(1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, function(k) {
+                          shiny::textAreaInput(paste0("subindicator-paragraph-", i, j, k), paste0("Paragraph ", k), width = "100%")
+                        })
+                      )
+                    )
+                  })
+                )
+              )
+            )
+          )
+        })
+      )
+    )
+  })
+
+  output$foot <- renderUI({
+    shinydashboard::box(
+      id = "foot_section",
+      title = "Bottom Section Input",
+      status = "warning",
+      solidHeader = TRUE,
+      collapsible = TRUE,
+      collapsed = TRUE,
+      width = "100%"
     )
   })
 
@@ -85,6 +178,16 @@ app_server <- function(input, output, session) {
         shinyjs::showElement(paste0("header_button", i), anim = TRUE, time = 0.5)
       } else {
         shinyjs::hideElement(paste0("header_button", i), anim = TRUE, time = 0.5)
+      }
+    }
+  })
+
+  observeEvent(input$num_sections, {
+    for (i in 1:MAX_BODY_SECTIONS) {
+      if (i <= input$num_sections) {
+        shinyjs::showElement(paste0("section-", i), anim = TRUE, time = 0.5)
+      } else {
+        shinyjs::hideElement(paste0("section-", i), anim = TRUE, time = 0.5)
       }
     }
   })

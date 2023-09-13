@@ -20,7 +20,9 @@ app_ui <- function(request) {
             class = "p-4",
             shiny::fileInput("file_in", "Upload the JSON file here:", accept = c(".json")),
             shiny::actionButton("examine_json", "Execute"),
-            shiny::uiOutput("head", class = "mt-3")
+            shiny::uiOutput("head", class = "mt-3"),
+            shiny::uiOutput("body", class = "mt-3"),
+            shiny::uiOutput("foot", class = "mt-3")
           )
         )
       )
