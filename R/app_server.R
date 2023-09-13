@@ -100,6 +100,7 @@ app_server <- function(input, output, session) {
                 collapsible = TRUE,
                 collapsed = TRUE,
                 width = 12,
+                shiny::textInput(paste0("indicator-", i), "Section Indicator"),
                 shiny::sliderInput(paste0("num-subindicators-", i), "Number of sub-indicators", 1, MAX_BODY_SECTION_SUBINDICATORS, 1, 1),
                 tags$div(
                   class = "row",
@@ -147,7 +148,7 @@ app_server <- function(input, output, session) {
 
     # Read the data from the json file
     # json_data <- rjson::fromJSON(file = isolate(input$file_in$datapath))
-    json_data <- rjson::fromJSON(file = "P:\\1887Building\\Epidemiology\\Dashboards\\HealthEquityDashboard\\data-raw\\chronic-disease.json")
+    json_data <- rjson::fromJSON(file = "P:\\1887Building\\Epidemiology\\Dashboards\\HealthEquityDashboard\\data-raw\\communicable-disease.json")
 
     # Using the data from the json file, set the values of input on the page
     shiny::updateTextInput(session, "head_indicator", value = json_data$header$indicator)
@@ -159,6 +160,19 @@ app_server <- function(input, output, session) {
     }
     for (i in 1:length(json_data$header$sections)) {
       shiny::updateTextInput(session, paste0("header_button", i), value = json_data$header$sections[[i]])
+    }
+
+    shiny::updateSliderInput(session, "num_sections", value = length(json_data$body))
+    for (i in 1:length(json_data$body)) {
+      shiny::updateTextInput(session, paste0("indicator-", i), value = json_data$body[[i]]$main_indicator)
+      shiny::updateSliderInput(session, paste0("num-subindicators-", i), value = length(json_data$body[[i]]$subindicators))
+      for (j in 1:length(json_data$body[[i]]$subindicators)) {
+        shiny::updateTextInput(session, paste0("subindicator-", i, j), value = json_data$body[[i]]$subindicators[[j]]$indicator)
+        shiny::updateSliderInput(session, paste0("subindicator-paragraph-slider-", i, j), value = length(json_data$body[[i]]$subindicators[[j]]$description))
+        for (k in 1:length(json_data$body[[i]]$subindicators[[j]]$description)) {
+          shiny::updateTextAreaInput(session, paste0("subindicator-paragraph-", i, j, k), value = json_data$body[[i]]$subindicators[[j]]$description[[k]])
+        }
+      }
     }
   })
 
