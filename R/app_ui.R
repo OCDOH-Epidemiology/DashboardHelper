@@ -23,7 +23,7 @@ app_ui <- function(request) {
             shiny::uiOutput("head", class = "mt-3"),
             shiny::uiOutput("body", class = "mt-3"),
             shiny::uiOutput("foot", class = "mt-3"),
-            shiny::uiOutput("preview"),
+            shiny::uiOutput("preview", class = "my-4"),
             shiny::uiOutput("page-foot")
           )
         )

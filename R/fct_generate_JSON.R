@@ -7,29 +7,21 @@
 #'
 #' @noRd
 generate_list_from_inputs <- function(input) {
-      req(input$file_in)
+      #req(input$file_in)
 
       # Create the JSON file to download
       exportFile <- list()
 
-      # Check to make sure the head indicator has a value, send an alert if it doesn't
-      if (input[["head-indicator"]] == "") shinyjs::alert("Header indicator input does not have a value.")
       exportFile$head$indicator <- input[["head-indicator"]]
 
       # Add each header paragraph to the exportFile
       exportFile$head$paragraphs <- lapply(1:input[["head-number-of-paragraphs"]], function(i) {
-        # Check that all textInputs have a value, send an alert if it doesn't
-        if (input[[paste0("head-paragraph-", i)]] == "") shinyjs::alert(paste0("Header paragraph input ", i, " does not have a value."))
-
         # Add the value of the textInput to exportFile$head$paragraphs
         input[[paste0("head-paragraph-", i)]]
       })
 
       # Add each header button to the exportFile
       exportFile$head$buttons <- lapply(1:input[["head-number-of-buttons"]], function(i) {
-        # Check that all textInputs have a value, send an alert if it doesn't
-        if (input[[paste0("head-button-", i)]] == "") shinyjs::alert(paste0("Header button input ", i, " does not have a value."))
-
         # Add the value of the textInput to exportFile$head$buttons
         input[[paste0("head-button-", i)]]
       })

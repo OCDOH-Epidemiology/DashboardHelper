@@ -1,11 +1,13 @@
-#' home_button
+#' make_home_button
 #'
-#' @description A utils function
+#' @description A function that creates a button that returns the user to the home page of the app
+#' 
+#' @details Uses Bootstrap 5.2.2 styling
 #'
-#' @return The return value, if any, from executing the utility.
+#' @return An HTML button that returns the user to the home page when pressed
 #'
 #' @noRd
-home_button <- function() {
+make_home_button <- function() {
   tags$a(
     href = "#",
     class = "btn btn-secondary btn-sm",

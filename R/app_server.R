@@ -228,10 +228,6 @@ app_server <- function(input, output, session) {
     )
   })
 
-  output$preview <- renderUI({
-    "PREVIEW HERE!"
-  })
-
   output[["page-foot"]] <- renderUI({
     tags$div(
       class = "fixed-bottom bg-outer-space",
@@ -251,128 +247,142 @@ app_server <- function(input, output, session) {
     }
   )
 
+  observeEvent(input[["update-preview"]], {
+    output$preview <- renderUI({
+      data_from_inputs <- generate_list_from_inputs(isolate(input))
+
+      tagList(
+        create_header(data_from_inputs$head),
+        create_body(data_from_inputs$body),
+        create_footer(data_from_inputs$foot)
+      )
+    })
+  })
+
   observeEvent(input$examine_json, {
     if (isolate(is.null(input$file_in))) {
       shinyjs::alert("Please upload a JSON file.")
       return()
     }
 
-    # Reset head inputs
-    shiny::updateTextInput(session, "head-indicator", value = "")
-    shiny::updateSliderInput(session, "head-number-of-paragraphs", value = 1)
-    shiny::updateSliderInput(session, "head-number-of-buttons", value = 1)
-    for (i in 1:MAX_HEADER_PARAGRAPHS) {
-      shiny::updateTextAreaInput(session, paste0("head-paragraph-", i), value = "")
-    }
-    for (i in 1:MAX_HEADER_BUTTONS) {
-      shiny::updateTextInput(session, paste0("head-button-", i), value = "")
-    }
-
-    # Reset body inputs
-    shiny::updateSliderInput(session, "number-of-sections", value = 1)
-    for (i in 1:MAX_BODY_SECTIONS) {
-      shiny::updateTextInput(session, paste0("section-indicator-", i), value = "")
-      shiny::updateTextInput(session, paste0("section-main-finding-", i), value = "")
-
-      shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = 0)
-      for (j in 1:MAX_BODY_SECTION_PARAGRAPHS) {
-        shiny::updateTextAreaInput(session, paste0("section-paragraph-", i, j), value = "")
+    isolate({
+      # Reset head inputs
+      shiny::updateTextInput(session, "head-indicator", value = "")
+      shiny::updateSliderInput(session, "head-number-of-paragraphs", value = 1)
+      shiny::updateSliderInput(session, "head-number-of-buttons", value = 1)
+      for (i in 1:MAX_HEADER_PARAGRAPHS) {
+        shiny::updateTextAreaInput(session, paste0("head-paragraph-", i), value = "")
+      }
+      for (i in 1:MAX_HEADER_BUTTONS) {
+        shiny::updateTextInput(session, paste0("head-button-", i), value = "")
       }
 
-      shiny::updateSliderInput(session, paste0("section-number-of-subindicators", i), value = 0)
-      for (j in 1:MAX_BODY_SECTION_SUBINDICATORS) {
-        shiny::updateTextInput(session, paste0("section-subindicator-", i, j), value = "")
-        shiny::updateSliderInput(session, paste0("section-number-of-subindicator-paragraphs-", i, j), value = 1)
-        for (k in 1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS) {
-          shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = "")
+      # Reset body inputs
+      shiny::updateSliderInput(session, "number-of-sections", value = 1)
+      for (i in 1:MAX_BODY_SECTIONS) {
+        shiny::updateTextInput(session, paste0("section-indicator-", i), value = "")
+        shiny::updateTextInput(session, paste0("section-main-finding-", i), value = "")
+
+        shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = 0)
+        for (j in 1:MAX_BODY_SECTION_PARAGRAPHS) {
+          shiny::updateTextAreaInput(session, paste0("section-paragraph-", i, j), value = "")
         }
-      }
 
-      shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = 1)
-      for (j in 1:MAX_BODY_SECTION_GRAPHS) {
-        shiny::updateTextInput(session, paste0("graph-id-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-title-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = "")
-        shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = "")
-      }
-    }
-
-
-
-    # Reset foot inputs
-    shiny::updateSliderInput(session, "number-of-footnotes", value = 0)
-    for (i in 1:MAX_FOOTER_FOOTNOTES) {
-      shiny::updateTextInput(session, paste0("footnote-text-", i), value = "")
-      shiny::updateTextInput(session, paste0("footnote-url-", i), value = "")
-    }
-
-    # Read the data from the json file
-    json_data <- rjson::fromJSON(file = isolate(input$file_in$datapath))
-    # json_data <- rjson::fromJSON(file = "P:\\1887Building\\Epidemiology\\Dashboards\\HealthEquityDashboard\\data-raw\\chronic-disease.json")
-
-    # Set head inputs based on json_data
-    shiny::updateTextInput(session, "head-indicator", value = json_data$head$indicator)
-    shiny::updateSliderInput(session, "head-number-of-paragraphs", value = length(json_data$head$paragraphs))
-    shiny::updateSliderInput(session, "head-number-of-buttons", value = length(json_data$head$buttons))
-    for (i in 1:length(json_data$head$paragraphs)) {
-      shiny::updateTextAreaInput(session, paste0("head-paragraph-", i), value = json_data$head$paragraphs[[i]])
-    }
-    for (i in 1:length(json_data$head$buttons)) {
-      shiny::updateTextInput(session, paste0("head-button-", i), value = json_data$head$buttons[[i]])
-    }
-
-    # Set body inputs based on json_data
-    shiny::updateSliderInput(session, "number-of-sections", value = length(json_data$body))
-    for (i in 1:length(json_data$body)) {
-      shiny::updateTextInput(session, paste0("section-indicator-", i), value = json_data$body[[i]]$indicator)
-      shiny::updateTextInput(session, paste0("section-main-finding-", i), value = json_data$body[[i]]$main_finding)
-
-      shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = length(json_data$body[[i]]$paragraphs))
-      # Check if there are paragraphs, if there are, fill the subindicator boxes
-      if (length(json_data$body[[i]]$paragraphs) > 0) {
-        for (j in 1:length(json_data$body[[i]]$paragraphs)) {
-          shiny::updateTextAreaInput(session, paste0("section-paragraph-", i, j), value = json_data$body[[i]]$paragraphs[[j]])
-        }
-      }
-
-      shiny::updateSliderInput(session, paste0("section-number-of-subindicators", i), value = length(json_data$body[[i]]$subindicators))
-      # Check if there are subindicators, if there are, fill the subindicator boxes
-      if (length(json_data$body[[i]]$subindicators) > 0) {
-        for (j in 1:length(json_data$body[[i]]$subindicators)) {
-          shiny::updateTextInput(session, paste0("section-subindicator-", i, j), value = json_data$body[[i]]$subindicators[[j]]$indicator)
-          shiny::updateSliderInput(session, paste0("section-number-of-subindicator-paragraphs-", i, j), value = length(json_data$body[[i]]$subindicators[[j]]$paragraphs))
-          for (k in 1:length(json_data$body[[i]]$subindicators[[j]]$paragraphs)) {
-            shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = json_data$body[[i]]$subindicators[[j]]$paragraphs[[k]])
+        shiny::updateSliderInput(session, paste0("section-number-of-subindicators", i), value = 0)
+        for (j in 1:MAX_BODY_SECTION_SUBINDICATORS) {
+          shiny::updateTextInput(session, paste0("section-subindicator-", i, j), value = "")
+          shiny::updateSliderInput(session, paste0("section-number-of-subindicator-paragraphs-", i, j), value = 1)
+          for (k in 1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS) {
+            shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = "")
           }
         }
+
+        shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = 1)
+        for (j in 1:MAX_BODY_SECTION_GRAPHS) {
+          shiny::updateTextInput(session, paste0("graph-id-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-title-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = "")
+        }
       }
 
-      # Set the values for the graph inputs
-      shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = length(json_data$body[[i]]$graph_data))
-      for (j in 1:length(json_data$body[[i]]$graph_data)) {
-        shiny::updateTextInput(session, paste0("graph-id-", i, j), value = json_data$body[[i]]$graph_data[[j]]$id)
-        shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = ifelse(is.null(json_data$body[[i]]$graph_data[[j]]$finding), "", json_data$body[[i]]$graph_data[[j]]$finding))
-        shiny::updateTextInput(session, paste0("graph-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$title)
-        shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = json_data$body[[i]]$graph_data[[j]]$footnote)
-        shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = json_data$body[[i]]$graph_data[[j]]$data_source)
-        shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_title)
-        shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_format)
-        shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$hover_format)
-      }
-    }
 
-    # Set foot inputs based on json_data
-    shiny::updateSliderInput(session, "number-of-footnotes", value = length(json_data$foot))
-    if (length(json_data$foot) > 0) {
-      for (i in 1:length(json_data$foot)) {
-        shiny::updateTextInput(session, paste0("footnote-text-", i), value = json_data$foot[[i]]$text)
-        shiny::updateTextInput(session, paste0("footnote-url-", i), value = ifelse(is.null(json_data$foot[[i]]$url), "", json_data$foot[[i]]$url))
+
+      # Reset foot inputs
+      shiny::updateSliderInput(session, "number-of-footnotes", value = 0)
+      for (i in 1:MAX_FOOTER_FOOTNOTES) {
+        shiny::updateTextInput(session, paste0("footnote-text-", i), value = "")
+        shiny::updateTextInput(session, paste0("footnote-url-", i), value = "")
       }
-    }
+
+      # Read the data from the json file
+      json_data <- rjson::fromJSON(file = isolate(input$file_in$datapath))
+      # json_data <- rjson::fromJSON(file = "P:\\1887Building\\Epidemiology\\Dashboards\\HealthEquityDashboard\\data-raw\\chronic-disease.json")
+
+      # Set head inputs based on json_data
+      shiny::updateTextInput(session, "head-indicator", value = json_data$head$indicator)
+      shiny::updateSliderInput(session, "head-number-of-paragraphs", value = length(json_data$head$paragraphs))
+      shiny::updateSliderInput(session, "head-number-of-buttons", value = length(json_data$head$buttons))
+      for (i in 1:length(json_data$head$paragraphs)) {
+        shiny::updateTextAreaInput(session, paste0("head-paragraph-", i), value = json_data$head$paragraphs[[i]])
+      }
+      for (i in 1:length(json_data$head$buttons)) {
+        shiny::updateTextInput(session, paste0("head-button-", i), value = json_data$head$buttons[[i]])
+      }
+
+      # Set body inputs based on json_data
+      shiny::updateSliderInput(session, "number-of-sections", value = length(json_data$body))
+      for (i in 1:length(json_data$body)) {
+        shiny::updateTextInput(session, paste0("section-indicator-", i), value = json_data$body[[i]]$indicator)
+        shiny::updateTextInput(session, paste0("section-main-finding-", i), value = json_data$body[[i]]$main_finding)
+
+        shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = length(json_data$body[[i]]$paragraphs))
+        # Check if there are paragraphs, if there are, fill the subindicator boxes
+        if (length(json_data$body[[i]]$paragraphs) > 0) {
+          for (j in 1:length(json_data$body[[i]]$paragraphs)) {
+            shiny::updateTextAreaInput(session, paste0("section-paragraph-", i, j), value = json_data$body[[i]]$paragraphs[[j]])
+          }
+        }
+
+        shiny::updateSliderInput(session, paste0("section-number-of-subindicators", i), value = length(json_data$body[[i]]$subindicators))
+        # Check if there are subindicators, if there are, fill the subindicator boxes
+        if (length(json_data$body[[i]]$subindicators) > 0) {
+          for (j in 1:length(json_data$body[[i]]$subindicators)) {
+            shiny::updateTextInput(session, paste0("section-subindicator-", i, j), value = json_data$body[[i]]$subindicators[[j]]$indicator)
+            shiny::updateSliderInput(session, paste0("section-number-of-subindicator-paragraphs-", i, j), value = length(json_data$body[[i]]$subindicators[[j]]$paragraphs))
+            for (k in 1:length(json_data$body[[i]]$subindicators[[j]]$paragraphs)) {
+              shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = json_data$body[[i]]$subindicators[[j]]$paragraphs[[k]])
+            }
+          }
+        }
+
+        # Set the values for the graph inputs
+        shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = length(json_data$body[[i]]$graph_data))
+        for (j in 1:length(json_data$body[[i]]$graph_data)) {
+          shiny::updateTextInput(session, paste0("graph-id-", i, j), value = json_data$body[[i]]$graph_data[[j]]$id)
+          shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = ifelse(is.null(json_data$body[[i]]$graph_data[[j]]$finding), "", json_data$body[[i]]$graph_data[[j]]$finding))
+          shiny::updateTextInput(session, paste0("graph-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$title)
+          shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = json_data$body[[i]]$graph_data[[j]]$footnote)
+          shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = json_data$body[[i]]$graph_data[[j]]$data_source)
+          shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_title)
+          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_format)
+          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$hover_format)
+        }
+      }
+
+      # Set foot inputs based on json_data
+      shiny::updateSliderInput(session, "number-of-footnotes", value = length(json_data$foot))
+      if (length(json_data$foot) > 0) {
+        for (i in 1:length(json_data$foot)) {
+          shiny::updateTextInput(session, paste0("footnote-text-", i), value = json_data$foot[[i]]$text)
+          shiny::updateTextInput(session, paste0("footnote-url-", i), value = ifelse(is.null(json_data$foot[[i]]$url), "", json_data$foot[[i]]$url))
+        }
+      }
+    })
   })
 
   observeEvent(input[["head-number-of-paragraphs"]], {
