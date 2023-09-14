@@ -235,6 +235,7 @@ app_server <- function(input, output, session) {
   output[["page-foot"]] <- renderUI({
     tags$div(
       class = "fixed-bottom bg-outer-space",
+      shiny::actionButton("update-preview", "Update Preview", class = "float-end m-2"),
       shiny::downloadButton("download-json", class = "float-end m-2")
     )
   })
@@ -269,6 +270,7 @@ app_server <- function(input, output, session) {
         input[[paste0("head-button-", i)]]
       })
 
+      # Add all the body data to the exportFile
       exportFile$body <- lapply(1:input[["number-of-sections"]], function(i) {
         body_list <- list()
         body_list$indicator <- input[[paste0("section-indicator-", i)]]
@@ -309,25 +311,29 @@ app_server <- function(input, output, session) {
           graph_list$y_format <- input[[paste0("graph-y-format-", i, j)]]
           graph_list$hover_format <- input[[paste0("graph-hover-format-", i, j)]]
 
-          if(input[[paste0("graph-finding-", i, j)]] != "") {
+          if (input[[paste0("graph-finding-", i, j)]] != "") {
             graph_list$finding <- json_data$body[[i]]$graph_data[[j]]$finding
           }
 
           return(graph_list)
         })
 
-
         return(body_list)
       })
 
+      # Add all the footer data to the exportFile
+      if (input[["number-of-footnotes"]] > 0) {
+        exportFile$foot <- lapply(1:input[["number-of-footnotes"]], function(i) {
+          foot_list <- list()
+          foot_list$text <- input[[paste0("footnote-text-", i)]]
 
+          if (input[[paste0("footnote-url-", i)]] != "") {
+            foot_list$url <- input[[paste0("footnote-url-", i)]]
+          }
 
-
-
-
-
-
-
+          return(foot_list)
+        })
+      }
 
       write(jsonlite::toJSON(exportFile, pretty = TRUE), file)
     }
