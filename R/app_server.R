@@ -30,16 +30,16 @@ app_server <- function(input, output, session) {
         tags$div(
           class = "col-md-8",
           shiny::sliderInput("head-number-of-paragraphs", "Number of paragraphs", 1, MAX_HEADER_PARAGRAPHS, 1, 1),
-          lapply(1:MAX_HEADER_PARAGRAPHS, function(x) {
-            shiny::textAreaInput(paste0("head-paragraph-", x), paste0("Header Paragraph ", x)) %>%
+          lapply(1:MAX_HEADER_PARAGRAPHS, function(i) {
+            shiny::textAreaInput(paste0("head-paragraph-", i), paste0("Header Paragraph ", i)) %>%
               shinyjs::hidden()
           })
         ),
         tags$div(
           class = "col-md-4",
           shiny::sliderInput("head-number-of-buttons", "Number of buttons", 1, MAX_HEADER_BUTTONS, 1, 1),
-          lapply(1:MAX_HEADER_BUTTONS, function(x) {
-            shiny::textInput(paste0("head-button-", x), paste0("Header Button ", x)) %>%
+          lapply(1:MAX_HEADER_BUTTONS, function(i) {
+            shiny::textInput(paste0("head-button-", i), paste0("Header Button ", i)) %>%
               shinyjs::hidden()
           })
         )
@@ -92,6 +92,20 @@ app_server <- function(input, output, session) {
       })
     })
 
+    lapply(1:MAX_BODY_SECTIONS, function(i) { # For each section
+      observeEvent(input[[paste0("section-number-of-graphs-", i)]], { # Create an observeEvent call for the slider controlling the number of graphs in a section
+        num_graphs <- input[[paste0("section-number-of-graphs-", i)]]
+
+        for (j in 1:MAX_BODY_SECTION_GRAPHS) { # For each paragraph input
+          if (j <= num_graphs) {
+            shinyjs::showElement(paste0("section-graph-inputs", i, j), anim = TRUE, time = 0.5) # Show the paragraph input
+          } else {
+            shinyjs::hideElement(paste0("section-graph-inputs", i, j), anim = TRUE, time = 0.5) # Hide the paragraph input
+          }
+        }
+      })
+    })
+
     shiny::tagList(
       shiny::sliderInput("number-of-sections", "Number of sections", 1, MAX_BODY_SECTIONS, 1, 1, width = "100%"),
       shinydashboard::box(
@@ -114,30 +128,77 @@ app_server <- function(input, output, session) {
                 collapsed = TRUE,
                 width = 12,
                 shiny::textInput(paste0("section-indicator-", i), "Section Indicator"),
-                shiny::sliderInput(paste0("section-number-of-paragraphs", i), "Number of paragraphs", 0, MAX_BODY_SECTION_PARAGRAPHS, 0, 1),
-                lapply(1:MAX_BODY_SECTION_PARAGRAPHS, function(j) {
-                  shinyjs::hidden(shiny::textAreaInput(paste0("section-paragraph-", i, j), paste0("Paragraph ", j)))
-                }),
-                shiny::sliderInput(paste0("section-number-of-subindicators", i), "Number of subindicators", 0, MAX_BODY_SECTION_SUBINDICATORS, 0, 1),
-                tags$div(
-                  class = "row",
-                  lapply(1:MAX_BODY_SECTION_SUBINDICATORS, function(j) {
+                shiny::textInput(paste0("section-main-finding-", i), "Main Finding (Optional)"),
+                shinydashboard::box(
+                  title = "Indicator Description Paragraphs (Optional)",
+                  status = "warning",
+                  solidHeader = TRUE,
+                  width = 12,
+                  collapsible = TRUE,
+                  collapsed = TRUE,
+                  shiny::sliderInput(paste0("section-number-of-paragraphs", i), "Number of paragraphs", 0, MAX_BODY_SECTION_PARAGRAPHS, 0, 1),
+                  lapply(1:MAX_BODY_SECTION_PARAGRAPHS, function(j) {
+                    shinyjs::hidden(shiny::textAreaInput(paste0("section-paragraph-", i, j), paste0("Paragraph ", j)))
+                  })
+                ),
+                shinydashboard::box(
+                  title = "Section Subindicators Paragraphs (Optional)",
+                  status = "warning",
+                  solidHeader = TRUE,
+                  width = 12,
+                  collapsible = TRUE,
+                  collapsed = TRUE,
+                  shiny::sliderInput(paste0("section-number-of-subindicators", i), "Number of subindicators", 0, MAX_BODY_SECTION_SUBINDICATORS, 0, 1),
+                  tags$div(
+                    class = "row",
+                    lapply(1:MAX_BODY_SECTION_SUBINDICATORS, function(j) {
+                      tags$div(
+                        id = paste0("section-subindicator-block-", i, j),
+                        class = "col-md-6",
+                        shinydashboard::box(
+                          status = "warning",
+                          solidHeader = TRUE,
+                          width = 12,
+                          collapsible = TRUE,
+                          collapsed = TRUE,
+                          shiny::textInput(paste0("section-subindicator-", i, j), "Indicator"),
+                          shiny::sliderInput(paste0("section-number-of-subindicator-paragraphs-", i, j), "Number of paragraphs", 1, MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, 1, 1),
+                          lapply(1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, function(k) {
+                            shiny::textAreaInput(paste0("section-subindicator-paragraph-", i, j, k), paste0("Paragraph ", k), width = "100%")
+                          })
+                        )
+                      )
+                    })
+                  )
+                ),
+                shiny::sliderInput(paste0("section-number-of-graphs-", i), "Number of Graphs in Section", 1, MAX_BODY_SECTION_GRAPHS, 1, 1),
+                lapply(1:MAX_BODY_SECTION_GRAPHS, function(j) {
+                  shinyjs::hidden(
                     tags$div(
-                      id = paste0("section-subindicator-block-", i, j),
-                      class = "col-md-6",
+                      class = "w-100",
+                      id = paste0("section-graph-inputs", i, j),
                       shinydashboard::box(
-                        status = "warning",
-                        solidHeader = TRUE,
                         width = 12,
-                        shiny::textInput(paste0("section-subindicator-", i, j), "Indicator"),
-                        shiny::sliderInput(paste0("section-number-of-subindicator-paragraphs-", i, j), "Number of paragraphs", 1, MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, 1, 1),
-                        lapply(1:MAX_BODY_SECTION_SUBINDICATOR_PARAGRAPHS, function(k) {
-                          shiny::textAreaInput(paste0("section-subindicator-paragraph-", i, j, k), paste0("Paragraph ", k), width = "100%")
-                        })
+                        collapsible = TRUE,
+                        collapsed = TRUE,
+                        solidHeader = TRUE,
+                        status = "warning",
+                        title = paste0("Section ", i, "; Graph ", j),
+                        tags$div(
+                          class = "row",
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-id", i, j), paste0("ID (ie: asthma-hospitalizations)"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-finding", i, j), paste0("Finding"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-title", i, j), paste0("Title"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-footnote", i, j), paste0("Footnote"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-data-source", i, j), paste0("Data Source (ie: asthma_hospitalizations)"))),
+                          tags$div(class = "col-md-2", shiny::textInput(paste0("graph-y-title", i, j), paste0("Y-Axis Title"))),
+                          tags$div(class = "col-md-1", shiny::textInput(paste0("graph-y-format", i, j), paste0("Y-Axis Number Format"))),
+                          tags$div(class = "col-md-1", shiny::textInput(paste0("graph-y-hover", i, j), paste0("Hover Format")))
+                        )
                       )
                     )
-                  })
-                )
+                  )
+                })
               )
             )
           )
@@ -167,6 +228,97 @@ app_server <- function(input, output, session) {
     )
   })
 
+  output$preview <- renderUI({
+    "PREVIEW HERE!"
+  })
+
+  output[["page-foot"]] <- renderUI({
+    tags$div(
+      class = "fixed-bottom bg-outer-space",
+      shiny::downloadButton("download-json", class = "float-end m-2")
+    )
+  })
+
+  output[["download-json"]] <- shiny::downloadHandler(
+    filename = "generated_file.json",
+    content = function(file) {
+      req(input$file_in)
+
+      # Create the JSON file to download
+      exportFile <- list()
+
+      # Check to make sure the head indicator has a value, send an alert if it doesn't
+      if (input[["head-indicator"]] == "") shinyjs::alert("Header indicator input does not have a value.")
+      exportFile$head$indicator <- input[["head-indicator"]]
+
+      # Add each header paragraph to the exportFile
+      exportFile$head$paragraphs <- lapply(1:input[["head-number-of-paragraphs"]], function(i) {
+        # Check that all textInputs have a value, send an alert if it doesn't
+        if (input[[paste0("head-paragraph-", i)]] == "") shinyjs::alert(paste0("Header paragraph input ", i, " does not have a value."))
+
+        # Add the value of the textInput to exportFile$head$paragraphs
+        input[[paste0("head-paragraph-", i)]]
+      })
+
+      # Add each header button to the exportFile
+      exportFile$head$buttons <- lapply(1:input[["head-number-of-buttons"]], function(i) {
+        # Check that all textInputs have a value, send an alert if it doesn't
+        if (input[[paste0("head-button-", i)]] == "") shinyjs::alert(paste0("Header button input ", i, " does not have a value."))
+
+        # Add the value of the textInput to exportFile$head$buttons
+        input[[paste0("head-button-", i)]]
+      })
+
+      exportFile$body <- lapply(1:input[["number-of-sections"]], function(i) {
+        return_list <- list()
+        return_list$indicator <- input[[paste0("section-indicator-", i)]]
+
+        # If the main finding is not blank, add it to the list
+        if (input[[paste0("section-main-finding-", i)]] != "") {
+          return_list$main_finding <- input[[paste0("section-main-finding-", i)]]
+        }
+
+        # If there is one or more paragraphs, add them to the list
+        if (input[[paste0("section-number-of-paragraphs", i)]] > 0) {
+          return_list$paragraphs <- lapply(1:input[[paste0("section-number-of-paragraphs", i)]], function(j) {
+            input[[paste0("section-paragraph-", i, j)]]
+          })
+        }
+
+        # If there is one or more subindicators, add them to the list
+        if (input[[paste0("section-number-of-subindicators", i)]] > 0) {
+          return_list$subindicators <- lapply(1:input[[paste0("section-number-of-subindicators", i)]], function(j) {
+            list(
+              indicator = input[[paste0("section-subindicator-", i, j)]],
+              paragraphs = lapply(1:input[[paste0("section-number-of-subindicator-paragraphs-", i, j)]], function(k) {
+                input[[paste0("section-subindicator-paragraph-", i, j, k)]]
+              })
+            )
+          })
+        }
+
+        # # Graph stuff
+        # return_list$graph_data <- lapply(1:input[[paste0("section-number-of-graphs-", i)]], function(j) {
+
+        # })
+
+
+        return(return_list)
+      })
+
+
+
+
+
+
+
+
+
+
+      write(jsonlite::toJSON(exportFile, pretty = TRUE), file)
+    }
+  )
+
   observeEvent(input$examine_json, {
     if (isolate(is.null(input$file_in))) {
       shinyjs::alert("Please upload a JSON file.")
@@ -188,6 +340,7 @@ app_server <- function(input, output, session) {
     shiny::updateSliderInput(session, "number-of-sections", value = 1)
     for (i in 1:MAX_BODY_SECTIONS) {
       shiny::updateTextInput(session, paste0("section-indicator-", i), value = "")
+      shiny::updateTextInput(session, paste0("section-main-finding-", i), value = "")
 
       shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = 0)
       for (j in 1:MAX_BODY_SECTION_PARAGRAPHS) {
@@ -230,6 +383,7 @@ app_server <- function(input, output, session) {
     shiny::updateSliderInput(session, "number-of-sections", value = length(json_data$body))
     for (i in 1:length(json_data$body)) {
       shiny::updateTextInput(session, paste0("section-indicator-", i), value = json_data$body[[i]]$indicator)
+      shiny::updateTextInput(session, paste0("section-main-finding-", i), value = json_data$body[[i]]$main_finding)
 
       shiny::updateSliderInput(session, paste0("section-number-of-paragraphs", i), value = length(json_data$body[[i]]$paragraphs))
       # Check if there are paragraphs, if there are, fill the subindicator boxes
@@ -254,9 +408,11 @@ app_server <- function(input, output, session) {
 
     # Set foot inputs based on json_data
     shiny::updateSliderInput(session, "number-of-footnotes", value = length(json_data$foot))
-    for (i in 1:length(json_data$foot)) {
-      shiny::updateTextInput(session, paste0("footnote-text-", i), value = json_data$foot[[i]]$text)
-      shiny::updateTextInput(session, paste0("footnote-url-", i), value = ifelse(is.null(json_data$foot[[i]]$url), "", json_data$foot[[i]]$url))
+    if (length(json_data$foot) > 0) {
+      for (i in 1:length(json_data$foot)) {
+        shiny::updateTextInput(session, paste0("footnote-text-", i), value = json_data$foot[[i]]$text)
+        shiny::updateTextInput(session, paste0("footnote-url-", i), value = ifelse(is.null(json_data$foot[[i]]$url), "", json_data$foot[[i]]$url))
+      }
     }
   })
 
