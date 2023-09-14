@@ -22,7 +22,9 @@ app_ui <- function(request) {
             shiny::actionButton("examine_json", "Execute"),
             shiny::uiOutput("head", class = "mt-3"),
             shiny::uiOutput("body", class = "mt-3"),
-            shiny::uiOutput("foot", class = "mt-3")
+            shiny::uiOutput("foot", class = "mt-3"),
+            shiny::uiOutput("preview"),
+            shiny::uiOutput("page-foot")
           )
         )
       )
