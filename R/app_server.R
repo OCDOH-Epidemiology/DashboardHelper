@@ -109,7 +109,7 @@ app_server <- function(input, output, session) {
     shiny::tagList(
       shiny::sliderInput("number-of-sections", "Number of sections", 1, MAX_BODY_SECTIONS, 1, 1, width = "100%"),
       shinydashboard::box(
-        id = "body_section",
+        id = "body-section",
         title = "Content Input",
         status = "warning",
         solidHeader = TRUE,
@@ -154,7 +154,7 @@ app_server <- function(input, output, session) {
                     lapply(1:MAX_BODY_SECTION_SUBINDICATORS, function(j) {
                       tags$div(
                         id = paste0("section-subindicator-block-", i, j),
-                        class = "col-md-6",
+                        class = "col-md-4",
                         shinydashboard::box(
                           status = "warning",
                           solidHeader = TRUE,
@@ -186,14 +186,14 @@ app_server <- function(input, output, session) {
                         title = paste0("Section ", i, "; Graph ", j),
                         tags$div(
                           class = "row",
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-id", i, j), paste0("ID (ie: asthma-hospitalizations)"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-finding", i, j), paste0("Finding"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-title", i, j), paste0("Title"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-footnote", i, j), paste0("Footnote"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-data-source", i, j), paste0("Data Source (ie: asthma_hospitalizations)"))),
-                          tags$div(class = "col-md-2", shiny::textInput(paste0("graph-y-title", i, j), paste0("Y-Axis Title"))),
-                          tags$div(class = "col-md-1", shiny::textInput(paste0("graph-y-format", i, j), paste0("Y-Axis Number Format"))),
-                          tags$div(class = "col-md-1", shiny::textInput(paste0("graph-y-hover", i, j), paste0("Hover Format")))
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-id-", i, j), paste0("ID (ie: asthma-hospitalizations)"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-finding-", i, j), paste0("Finding"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-title-", i, j), paste0("Title"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-footnote-", i, j), paste0("Footnote"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-data-source-", i, j), paste0("Data Source (ie: asthma_hospitalizations)"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-title-", i, j), paste0("Y-Axis Title"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-format-", i, j), paste0("Y-Axis Number Format"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-hover-format-", i, j), paste0("Hover Format")))
                         )
                       )
                     )
@@ -270,24 +270,24 @@ app_server <- function(input, output, session) {
       })
 
       exportFile$body <- lapply(1:input[["number-of-sections"]], function(i) {
-        return_list <- list()
-        return_list$indicator <- input[[paste0("section-indicator-", i)]]
+        body_list <- list()
+        body_list$indicator <- input[[paste0("section-indicator-", i)]]
 
         # If the main finding is not blank, add it to the list
         if (input[[paste0("section-main-finding-", i)]] != "") {
-          return_list$main_finding <- input[[paste0("section-main-finding-", i)]]
+          body_list$main_finding <- input[[paste0("section-main-finding-", i)]]
         }
 
         # If there is one or more paragraphs, add them to the list
         if (input[[paste0("section-number-of-paragraphs", i)]] > 0) {
-          return_list$paragraphs <- lapply(1:input[[paste0("section-number-of-paragraphs", i)]], function(j) {
+          body_list$paragraphs <- lapply(1:input[[paste0("section-number-of-paragraphs", i)]], function(j) {
             input[[paste0("section-paragraph-", i, j)]]
           })
         }
 
         # If there is one or more subindicators, add them to the list
         if (input[[paste0("section-number-of-subindicators", i)]] > 0) {
-          return_list$subindicators <- lapply(1:input[[paste0("section-number-of-subindicators", i)]], function(j) {
+          body_list$subindicators <- lapply(1:input[[paste0("section-number-of-subindicators", i)]], function(j) {
             list(
               indicator = input[[paste0("section-subindicator-", i, j)]],
               paragraphs = lapply(1:input[[paste0("section-number-of-subindicator-paragraphs-", i, j)]], function(k) {
@@ -297,13 +297,27 @@ app_server <- function(input, output, session) {
           })
         }
 
-        # # Graph stuff
-        # return_list$graph_data <- lapply(1:input[[paste0("section-number-of-graphs-", i)]], function(j) {
+        # Graph stuff
+        body_list$graph_data <- lapply(1:input[[paste0("section-number-of-graphs-", i)]], function(j) {
+          graph_list <- list()
 
-        # })
+          graph_list$id <- input[[paste0("graph-id-", i, j)]]
+          graph_list$title <- input[[paste0("graph-title-", i, j)]]
+          graph_list$footnote <- input[[paste0("graph-footnote-", i, j)]]
+          graph_list$data_source <- input[[paste0("graph-data-source-", i, j)]]
+          graph_list$y_title <- input[[paste0("graph-y-title-", i, j)]]
+          graph_list$y_format <- input[[paste0("graph-y-format-", i, j)]]
+          graph_list$hover_format <- input[[paste0("graph-hover-format-", i, j)]]
+
+          if(input[[paste0("graph-finding-", i, j)]] != "") {
+            graph_list$finding <- json_data$body[[i]]$graph_data[[j]]$finding
+          }
+
+          return(graph_list)
+        })
 
 
-        return(return_list)
+        return(body_list)
       })
 
 
@@ -355,7 +369,21 @@ app_server <- function(input, output, session) {
           shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = "")
         }
       }
+
+      shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = 1)
+      for (j in 1:MAX_BODY_SECTION_GRAPHS) {
+        shiny::updateTextInput(session, paste0("graph-id-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-title-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = "")
+        shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = "")
+      }
     }
+
+
 
     # Reset foot inputs
     shiny::updateSliderInput(session, "number-of-footnotes", value = 0)
@@ -403,6 +431,19 @@ app_server <- function(input, output, session) {
             shiny::updateTextAreaInput(session, paste0("section-subindicator-paragraph-", i, j, k), value = json_data$body[[i]]$subindicators[[j]]$paragraphs[[k]])
           }
         }
+      }
+
+      # Set the values for the graph inputs
+      shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = length(json_data$body[[i]]$graph_data))
+      for (j in 1:length(json_data$body[[i]]$graph_data)) {
+        shiny::updateTextInput(session, paste0("graph-id-", i, j), value = json_data$body[[i]]$graph_data[[j]]$id)
+        shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = ifelse(is.null(json_data$body[[i]]$graph_data[[j]]$finding), "", json_data$body[[i]]$graph_data[[j]]$finding))
+        shiny::updateTextInput(session, paste0("graph-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$title)
+        shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = json_data$body[[i]]$graph_data[[j]]$footnote)
+        shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = json_data$body[[i]]$graph_data[[j]]$data_source)
+        shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_title)
+        shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_format)
+        shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$hover_format)
       }
     }
 
