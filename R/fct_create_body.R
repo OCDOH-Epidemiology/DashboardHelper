@@ -59,7 +59,7 @@ create_body <- function(data_in, ns) {
                 tags$h3(class = "text-center fs-3 fw-bold", data_in[[i]]$graph_data[[j]]$finding)
               },
               tags$h5(class = "text-center mt-4", data_in[[i]]$graph_data[[j]]$title),
-              shinipsum::random_ggplotly(),
+              shinipsum::random_ggplotly(type = "bar"),
               #mod_add_graph_ui(ns(format_id(data_in[[i]]$graph_data[[j]]$id))),
               tags$div(style = "font-size: .75rem;", class = "px-5", HTML(data_in[[i]]$graph_data[[j]]$footnote))
             )
