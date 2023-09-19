@@ -192,8 +192,8 @@ app_server <- function(input, output, session) {
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-footnote-", i, j), paste0("Footnote"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-data-source-", i, j), paste0("Data Source (ie: asthma_hospitalizations)"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-title-", i, j), paste0("Y-Axis Title"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-format-", i, j), paste0("Y-Axis Number Format"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-hover-format-", i, j), paste0("Hover Format")))
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-format-", i, j), paste0("Y-Axis Number Format")), value = ",0"),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-hover-format-", i, j), paste0("Hover Format")), value = ".1f")
                         )
                       )
                     )
@@ -305,8 +305,8 @@ app_server <- function(input, output, session) {
           shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = "")
-          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = "")
-          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = ",0")
+          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = ".1f")
         }
       }
 
