@@ -1,27 +1,28 @@
 Package: DashboardHelper
-Title: PKG_TITLE
+Title: DashboardHelper
 Version: 0.0.0.9000
 Authors@R: 
     person("Samuel", "Rubin", , "srubin@orangecountygov.com", role = c("cre", "aut"))
-Description: A dashboard to help generate code for updating the Orange
-    County Health Equity Dashboard
+Description: A dashboard used to update the JSON files for the Orange
+    County Health Equity Dashboard.
 License: What license is it under?
 URL: https://github.com/OCDOH-Epidemiology/DashboardHelper
 BugReports: https://github.com/OCDOH-Epidemiology/DashboardHelper/issues
 Imports: 
     bslib,
     config (>= 0.3.1),
-    dplyr,
     golem (>= 0.3.5),
+    jsonlite,
     magrittr,
-    plotly,
-    readxl,
+    rjson,
+    shinipsum,
     shiny (>= 1.7.4),
-    stringr,
-    usethis
+    shinydashboard,
+    shinyjs,
+    stringr
+Suggests: 
+    pkgload
+Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3

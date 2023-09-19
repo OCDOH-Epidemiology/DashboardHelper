@@ -20,8 +20,8 @@
 ##
 golem::fill_desc(
   pkg_name = "DashboardHelper", # The Name of the package containing the App
-  pkg_title = "PKG_TITLE", # The Title of the package containing the App
-  pkg_description = "A dashboard to help generate code for updating the Orange County Health Equity Dashboard", # The Description of the package containing the App
+  pkg_title = "DashboardHelper", # The Title of the package containing the App
+  pkg_description = "A dashboard used to update the JSON files for the Orange County Health Equity Dashboard.", # The Description of the package containing the App
   author_first_name = "Samuel", # Your First Name
   author_last_name = "Rubin", # Your Last Name
   author_email = "srubin@orangecountygov.com", # Your Email
@@ -33,7 +33,7 @@ golem::set_golem_options()
 
 ## Create Common Files ----
 ## See ?usethis for more information
-usethis::use_mit_license("Golem User") # You can set another license here
+usethis::use_cc0_license() # You can set another license here
 usethis::use_readme_rmd(open = FALSE)
 # Note that `contact` is required since usethis version 2.1.5
 # If your {usethis} version is older, you can remove that param
