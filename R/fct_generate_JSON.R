@@ -68,7 +68,7 @@ generate_list_from_inputs <- function(input) {
           graph_list$hover_format <- input[[paste0("graph-hover-format-", i, j)]]
 
           if (input[[paste0("graph-finding-", i, j)]] != "") {
-            graph_list$finding <- json_data$body[[i]]$graph_data[[j]]$finding
+            graph_list$finding <- input[[paste0("graph-finding-", i, j)]]
           }
 
           return(graph_list)
