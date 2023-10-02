@@ -16,6 +16,12 @@ app_server <- function(input, output, session) {
   MAX_FOOTER_FOOTNOTES <- 10
 
   output$head <- renderUI({
+    lapply(1:MAX_HEADER_BUTTONS, function(i) {
+      observeEvent(input[[paste0("head-button-", i)]], { # Create an observeEvent for each textInput for the buttons
+        shiny::updateTextInput(session, paste0("section-indicator-", i), value = input[[paste0("head-button-", i)]])
+      })
+    })
+
     shinydashboard::box(
       id = "head_section",
       title = "Page Header Input",
@@ -48,6 +54,12 @@ app_server <- function(input, output, session) {
   })
 
   output$body <- renderUI({
+    lapply(1:MAX_BODY_SECTIONS, function(i) {
+      observeEvent(input[[paste0("section-indicator-", i)]], { # Create an observeEvent for each textInput for the buttons
+        shiny::updateTextInput(session, paste0("head-button-", i), value = input[[paste0("section-indicator-", i)]])
+      })
+    })
+
     lapply(1:MAX_BODY_SECTIONS, function(i) { # For each section
       observeEvent(input[[paste0("section-number-of-subindicators", i)]], { # Create an observeEvent call for the slider in that section
         num_subindicators <- input[[paste0("section-number-of-subindicators", i)]] # Store the value of the slider in the section
