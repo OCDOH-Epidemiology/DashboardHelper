@@ -7,8 +7,6 @@
 #'
 #' @noRd
 generate_list_from_inputs <- function(input) {
-      #req(input$file_in)
-
       # Create the JSON file to download
       exportFile <- list()
 

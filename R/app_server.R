@@ -250,8 +250,6 @@ app_server <- function(input, output, session) {
   output[["download-json"]] <- shiny::downloadHandler(
     filename = "generated_file.json",
     content = function(file) {
-      req(input$file_in)
-
       exportFile <- generate_list_from_inputs(input)
 
       write(jsonlite::toJSON(exportFile, pretty = TRUE), file)
