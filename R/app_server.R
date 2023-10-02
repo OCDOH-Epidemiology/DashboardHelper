@@ -186,11 +186,10 @@ app_server <- function(input, output, session) {
                         title = paste0("Section ", i, "; Graph ", j),
                         tags$div(
                           class = "row",
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-id-", i, j), paste0("ID (ie: asthma-hospitalizations)"))),
+                          tags$div(class = "col-md-3", shiny::textInput(paste0("excel-sheet-name", i, j), paste0("Excel Sheet Name"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-finding-", i, j), paste0("Finding"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-title-", i, j), paste0("Title"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-footnote-", i, j), paste0("Footnote"))),
-                          tags$div(class = "col-md-3", shiny::textInput(paste0("graph-data-source-", i, j), paste0("Data Source (ie: asthma_hospitalizations)"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-title-", i, j), paste0("Y-Axis Title"))),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-y-format-", i, j), paste0("Y-Axis Number Format")), value = ",0"),
                           tags$div(class = "col-md-3", shiny::textInput(paste0("graph-hover-format-", i, j), paste0("Hover Format")), value = ".1f")
@@ -247,17 +246,30 @@ app_server <- function(input, output, session) {
     }
   )
 
-  observeEvent(input[["update-preview"]], {
-    output$preview <- renderUI({
-      data_from_inputs <- generate_list_from_inputs(isolate(input))
+  data_to_preview <- reactiveVal()
 
-      tagList(
-        create_header(data_from_inputs$head),
-        create_body(data_from_inputs$body),
-        create_footer(data_from_inputs$foot)
-      )
-    })
+
+  observeEvent(input[["update-preview"]], {
+    data_from_inputs <- generate_list_from_inputs(input)
+    data_to_preview(data_from_inputs)
   })
+
+  output$preview <- renderUI({
+    data <- data_to_preview()
+
+    if (is.null(data)) {
+      return(NULL) # Initial state, nothing to show
+    }
+
+    print("Updating preview!")
+
+    tagList(
+      create_header(data$head),
+      create_body(data$body),
+      create_footer(data$foot)
+    )
+  })
+
 
   observeEvent(input$examine_json, {
     if (isolate(is.null(input$file_in))) {
@@ -299,11 +311,10 @@ app_server <- function(input, output, session) {
 
         shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = 1)
         for (j in 1:MAX_BODY_SECTION_GRAPHS) {
-          shiny::updateTextInput(session, paste0("graph-id-", i, j), value = "")
+          shiny::updateTextInput(session, paste0("excel-sheet-name", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-title-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = "")
-          shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = "")
           shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = ",0")
           shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = ".1f")
@@ -363,14 +374,15 @@ app_server <- function(input, output, session) {
         # Set the values for the graph inputs
         shiny::updateSliderInput(session, paste0("section-number-of-graphs-", i), value = length(json_data$body[[i]]$graph_data))
         for (j in 1:length(json_data$body[[i]]$graph_data)) {
-          shiny::updateTextInput(session, paste0("graph-id-", i, j), value = json_data$body[[i]]$graph_data[[j]]$id)
-          shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = ifelse(is.null(json_data$body[[i]]$graph_data[[j]]$finding), "", json_data$body[[i]]$graph_data[[j]]$finding))
-          shiny::updateTextInput(session, paste0("graph-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$title)
-          shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = json_data$body[[i]]$graph_data[[j]]$footnote)
-          shiny::updateTextInput(session, paste0("graph-data-source-", i, j), value = json_data$body[[i]]$graph_data[[j]]$data_source)
-          shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_title)
-          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$y_format)
-          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = json_data$body[[i]]$graph_data[[j]]$hover_format)
+          current_graph_data <- json_data$body[[i]]$graph_data[[j]]
+
+          shiny::updateTextInput(session, paste0("excel-sheet-name", i, j), value = gsub("-", " ", current_graph_data$id))
+          shiny::updateTextInput(session, paste0("graph-finding-", i, j), value = ifelse(is.null(current_graph_data$finding), "", current_graph_data$finding))
+          shiny::updateTextInput(session, paste0("graph-title-", i, j), value = current_graph_data$title)
+          shiny::updateTextInput(session, paste0("graph-footnote-", i, j), value = current_graph_data$footnote)
+          shiny::updateTextInput(session, paste0("graph-y-title-", i, j), value = current_graph_data$y_title)
+          shiny::updateTextInput(session, paste0("graph-y-format-", i, j), value = current_graph_data$y_format)
+          shiny::updateTextInput(session, paste0("graph-hover-format-", i, j), value = current_graph_data$hover_format)
         }
       }
 
