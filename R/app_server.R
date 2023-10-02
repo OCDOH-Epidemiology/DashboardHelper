@@ -248,7 +248,6 @@ app_server <- function(input, output, session) {
 
   data_to_preview <- reactiveVal()
 
-
   observeEvent(input[["update-preview"]], {
     data_from_inputs <- generate_list_from_inputs(input)
     data_to_preview(data_from_inputs)
@@ -269,7 +268,6 @@ app_server <- function(input, output, session) {
       create_footer(data$foot)
     )
   })
-
 
   observeEvent(input$examine_json, {
     if (isolate(is.null(input$file_in))) {
@@ -408,6 +406,10 @@ app_server <- function(input, output, session) {
   })
 
   observeEvent(input[["head-number-of-buttons"]], {
+    # Update the slider for number of sections
+    shiny::updateSliderInput(session, "number-of-sections", value = input[["head-number-of-buttons"]])
+
+    # Update the visibility of textInputs for the page buttons
     for (i in 1:MAX_HEADER_BUTTONS) {
       if (i <= input[["head-number-of-buttons"]]) {
         shinyjs::showElement(paste0("head-button-", i), anim = TRUE, time = 0.5)
@@ -418,6 +420,10 @@ app_server <- function(input, output, session) {
   })
 
   observeEvent(input[["number-of-sections"]], {
+    # Update the slider for number of buttons in the header
+    shiny::updateSliderInput(session, "head-number-of-buttons", value = input[["number-of-sections"]])
+
+    # Update the visibility of boxes for inputting section info
     for (i in 1:MAX_BODY_SECTIONS) {
       if (i <= input[["number-of-sections"]]) {
         shinyjs::showElement(paste0("section-", i), anim = TRUE, time = 0.5)
