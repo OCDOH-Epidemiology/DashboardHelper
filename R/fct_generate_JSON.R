@@ -57,10 +57,10 @@ generate_list_from_inputs <- function(input) {
         body_list$graph_data <- lapply(1:input[[paste0("section-number-of-graphs-", i)]], function(j) {
           graph_list <- list()
 
-          graph_list$id <- gsub(" ", "-", input[[paste0("excel-sheet-name", i, j)]])
+          graph_list$id <- tolower(gsub(" ", "-", input[[paste0("excel-sheet-name", i, j)]]))
           graph_list$title <- input[[paste0("graph-title-", i, j)]]
           graph_list$footnote <- input[[paste0("graph-footnote-", i, j)]]
-          graph_list$data_source <- gsub(" ", "_", input[[paste0("excel-sheet-name", i, j)]])
+          graph_list$data_source <- tolower(gsub(" ", "_", input[[paste0("excel-sheet-name", i, j)]]))
           graph_list$y_title <- input[[paste0("graph-y-title-", i, j)]]
           graph_list$y_format <- input[[paste0("graph-y-format-", i, j)]]
           graph_list$hover_format <- input[[paste0("graph-hover-format-", i, j)]]
