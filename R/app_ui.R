@@ -24,7 +24,11 @@ app_ui <- function(request) {
             shiny::uiOutput("body", class = "mt-3"),
             shiny::uiOutput("foot", class = "mt-3"),
             shiny::uiOutput("preview", class = "my-4"),
-            shiny::uiOutput("page-foot")
+            tags$div(
+              class = "fixed-bottom bg-outer-space",
+              shiny::actionButton("update_preview", "Update Preview", class = "float-end m-2"),
+              shiny::downloadButton("download_json", class = "float-end m-2")
+            )
           )
         )
       )

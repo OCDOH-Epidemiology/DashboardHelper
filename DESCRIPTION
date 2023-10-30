@@ -11,11 +11,12 @@ BugReports: https://github.com/OCDOH-Epidemiology/DashboardHelper/issues
 Imports: 
     bslib,
     config (>= 0.3.1),
+    DT,
     golem (>= 0.3.5),
     jsonlite,
     magrittr,
+    plotly,
     rjson,
-    shinipsum,
     shiny (>= 1.7.4),
     shinydashboard,
     shinyjs,

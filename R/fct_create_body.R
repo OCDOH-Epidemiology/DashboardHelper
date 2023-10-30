@@ -7,65 +7,60 @@
 #' @return A list of HTML sections representing the report body.
 #'
 #' @noRd
-create_body <- function(data_in, ns) {
-  if (length(data_in) == 0) {
+create_body <- function(body_data, ns) {
+  if (length(body_data) == 0) {
     return()
   }
 
-  lapply(1:length(data_in), function(i) {
-    background_color <- ifelse(i %% 2 == 0, "bg-water", "bg-white")
+  lapply(1:length(body_data), function(i) {
+      # Pull the variables for creating the section
+      current_section <- body_data[[i]]
+      indicator <- current_section$indicator
+      number_of_paragraphs <- length(current_section$paragraphs)
+      number_of_subindicators <- length(current_section$subindicators)
+      number_of_graphs <- length(current_section$carousel_data)
 
-    tags$section(
-      id = format_id(data_in[[i]]$indicator),
-      class = paste0(background_color, " px-5 py-3"),
-      tags$h3(class = "fw-bold", data_in[[i]]$indicator),
+      indicator_description_area <- tagList(
+        tags$h1(indicator),
+        if (number_of_paragraphs > 0) {
+          lapply(1:number_of_paragraphs, function(j) {
+            tags$p(HTML(current_section$paragraphs[[j]]))
+          })
+        },
+        if (number_of_subindicators > 0) {
+          lapply(1:number_of_subindicators, function(j) {
+            # Store the current subindicator
+            current_subindicator <- current_section$subindicators[[j]]
 
-      # Generate description paragraphs
-      lapply(1:length(data_in[[i]]$paragraphs), function(j) {
-        tags$p(HTML(class = "", data_in[[i]]$paragraphs[[j]]))
-      }),
+            # Count how many paragraphs there are for the current subindicator
+            number_of_sub_paragraphs <- length(current_subindicator$paragraphs)
 
-      # Generate subindicator information if there is any
-      if (!is.null(data_in[[i]]$subindicators)) {
-        lapply(1:length(data_in[[i]]$subindicators), function(j) {
-          tags$div(
-            if (data_in[[i]]$subindicators[[j]]$indicator != "") {
-              tags$h5(class = "fw-bold", data_in[[i]]$subindicators[[j]]$indicator)
-            },
-            lapply(1:length(data_in[[i]]$subindicators[[j]]$paragraphs), function(k) {
-              tags$p(HTML(class = "", data_in[[i]]$subindicators[[j]]$paragraphs[[k]]))
-            })
-          )
-        })
-      },
-
-      # Generate a header element for the main finding if there is one
-      if (!is.null(data_in[[i]]$main_finding)) {
-        tags$h3(class = "text-center fw-bold mt-3", data_in[[i]]$main_finding)
-      },
-
-      # Generate the area for the graphs in the current section
-      tags$div(
-        class = "row mt-1 g-4 justify-content-center",
-
-        # Generate each graph in its own column with its finding, title, and footnote
-        lapply(1:length(data_in[[i]]$graph_data), function(j) {
-          tags$div(
-            class = "col-lg-6",
-            tags$div(
-              class = "w-100 h-100 d-flex flex-column justify-content-between",
-              # Generate a header element for the finding of the graph if there is one
-              if (!is.null(data_in[[i]]$graph_data[[j]]$finding)) {
-                tags$h3(class = "text-center fs-3 fw-bold", data_in[[i]]$graph_data[[j]]$finding)
-              },
-              tags$h5(class = "text-center mt-4", data_in[[i]]$graph_data[[j]]$title),
-              shinipsum::random_ggplotly(type = "bar"),
-              #mod_add_graph_ui(ns(format_id(data_in[[i]]$graph_data[[j]]$id))),
-              tags$div(style = "font-size: .75rem;", class = "px-5", HTML(data_in[[i]]$graph_data[[j]]$footnote))
+            tagList(
+              tags$h3(current_subindicator$indicator),
+              if (number_of_sub_paragraphs > 0) {
+                lapply(1:number_of_sub_paragraphs, function(k) {
+                  tags$p(HTML(current_subindicator$paragraphs[[k]]))
+                })
+              }
             )
-          )
-        })
+          })
+        }
       )
-    )
-  })
+
+      tags$section(
+        id = tolower(gsub(" ", "-", indicator)),
+        class = paste("row py-3 m-0", ifelse(i %% 2 == 0, "bg-water", "bg-teal")),
+        if (i %% 2 == 0) {
+          tagList(
+            div(class = "col-xxl-6 col-xl-5 px-5 description-area order-xl-1 align-self-center", indicator_description_area),
+            div(class = "col-xxl-6 col-xl-7 order-xl-2", mod_carousel_ui(ns(tolower(gsub(" ", "-", indicator))), current_section, "dark"))
+          )
+        } else {
+          tagList(
+            div(class = "col-xxl-6 col-xl-5 px-5 description-area order-xl-2 align-self-center", indicator_description_area),
+            div(class = "col-xxl-6 col-xl-7 order-xl-1", mod_carousel_ui(ns(tolower(gsub(" ", "-", indicator))), current_section, "light"))
+          )
+        }
+      )
+    })
 }
