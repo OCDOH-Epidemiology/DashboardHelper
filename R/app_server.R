@@ -331,13 +331,16 @@ app_server <- function(input, output, session) {
 
     print("Updating preview!")
 
-    jsonlite::toJSON(data, pretty = TRUE)
+    # jsonlite::toJSON(data, pretty = TRUE)
 
-    # tagList(
-    #   create_header(data$head),
-    #   create_body(data$body),
-    #   create_footer(data$foot)
-    # )
+    tagList(
+      create_header(data$head),
+      create_body(data$body),
+      create_footer(data$foot),
+      lapply(1:input$num_sections, function(i) {
+        mod_carousel_server(tolower(gsub(" ", "-", data$body[[i]]$indicator)), data$body[[i]])
+      })
+    )
   })
 
   observeEvent(input$examine_json, {

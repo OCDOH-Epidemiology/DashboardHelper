@@ -68,9 +68,15 @@ mod_carousel_server <- function(id, section_data) {
       current_graph <- section_data$carousel_data[[i]]
 
       # Get the data for the graph
-      data_source <- get(current_graph$rda_data_file)
+      data_source <- switch(current_graph$data_format_type,
+        "rate" = sample_rate_data,
+        "percent" = sample_percent_data,
+        "currency" = sample_currency_data
+      )
+
       num_columns <- ncol(data_source)
       y_title <- current_graph$y_title
+      y_axis_title <- current_graph$y_axis_title
 
       # Set number formatting for the graph
       y_format <- switch(current_graph$data_format_type,
@@ -91,7 +97,6 @@ mod_carousel_server <- function(id, section_data) {
       fig_colors <- rep(fig_colors, ceiling(num_columns / 4))
 
       output[[paste0("graph", i)]] <- plotly::renderPlotly({
-        # Create an empty plotly object
         fig <- plotly::plot_ly()
 
         # Dynamically create bars for the graph based on the number of columns
@@ -118,13 +123,11 @@ mod_carousel_server <- function(id, section_data) {
         # Set the layout of the graph
         fig <- fig %>% plotly::layout(
           xaxis = list(title = "", categoryorder = "trace", fixedrange = TRUE),
-          yaxis = list(title = y_title, tickformat = y_format, hoverformat = hover_format, fixedrange = TRUE),
+          yaxis = list(title = y_axis_title, tickformat = y_format, hoverformat = hover_format, fixedrange = TRUE),
           legend = list(orientation = "h", x = 0.5, xanchor = "center"),
           uniformtext = list(minsize = 8, mode = "hide"),
           dragmode = FALSE
         )
-
-        # plotly::plotly_IMAGE(fig, out_file = current_graph$id)
 
         # Render the graph
         fig
