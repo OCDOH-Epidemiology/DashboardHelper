@@ -67,33 +67,43 @@ mod_carousel_server <- function(id, section_data) {
     lapply(1:length(section_data$carousel_data), function(i) {
       current_graph <- section_data$carousel_data[[i]]
 
-      # Get the data for the graph
+      # Depending on the data format type of the current graph,
+      # assign the appropriate data source to `data_source`
       data_source <- switch(current_graph$data_format_type,
-        "rate" = sample_rate_data,
-        "percent" = sample_percent_data,
-        "currency" = sample_currency_data
+        "rate" = sample_rate_data, # For "rate", use sample_rate_data
+        "percent" = sample_percent_data, # For "percent", use sample_percent_data
+        "currency" = sample_currency_data # For "currency", use sample_currency_data
       )
 
+      # Assign a format string to `y_format` based on the data format type of the current graph.
+      # This format string will be used for the y-axis labels
+      y_format <- switch(current_graph$data_format_type,
+        "rate" = ",0", # For "rate", format with no decimal places
+        "percent" = ".0%", # For "percent", format as percentage with no decimal places
+        "currency" = "$," # For "currency", format with a dollar sign and no decimal places
+      )
+
+      # Assign a format string to `hover_format` based on the data format type of the current graph.
+      # This format string will be used for the tooltip/hover information
+      hover_format <- switch(current_graph$data_format_type,
+        "rate" = ",.1f", # For "rate", format with one decimal place
+        "percent" = ".1%", # For "percent", format as percentage with one decimal place
+        "currency" = "$,.0f" # For "currency", format with a dollar sign and no decimal places
+      )
+
+      # Retrieve the number of columns from the data source
       num_columns <- ncol(data_source)
+
+      # Assign the y-title and y-axis title from the current graph
       y_title <- current_graph$y_title
       y_axis_title <- current_graph$y_axis_title
 
-      # Set number formatting for the graph
-      y_format <- switch(current_graph$data_format_type,
-        "rate" = ",0",
-        "percent" = ".0%",
-        "currency" = "$,"
-      )
-
-      hover_format <- switch(current_graph$data_format_type,
-        "rate" = ",.1f",
-        "percent" = ".1%",
-        "currency" = "$,.0f"
-      )
-
-      # Create an array of colors for the graph
-      # repeat the colors if there are more than 4 columns
+      # Define a color palette for the graph
       fig_colors <- c("#007b85", "#61c2ee", "#00a79e", "#67a142")
+
+      # If there are more than 4 columns, repeat the colors to cover all columns.
+      # The ceiling function ensures that even if there's a partial set needed (e.g., 5 columns),
+      # it would still repeat the whole set, so all columns get a color.
       fig_colors <- rep(fig_colors, ceiling(num_columns / 4))
 
       output[[paste0("graph", i)]] <- plotly::renderPlotly({
@@ -136,10 +146,10 @@ mod_carousel_server <- function(id, section_data) {
       observeEvent(input[[paste0("modal", i)]], {
         shiny::showModal(
           shiny::modalDialog(
-            title = HTML(paste("More about", tags$span(class = "text-decoration-underline fw-bold", current_graph$id))),
+            title = HTML(paste("More about", tags$span(class = "text-decoration-underline fw-bold", current_graph$data_name))),
             tags$div(
               tags$span(class = "fw-bold", "Sources:"),
-              tags$p(class = "fs-6 mb-1", current_graph$source)
+              tags$p(class = "fs-6 mb-1", current_graph$data_source)
             ),
             tags$hr(class = "my-2"),
             tags$div(
@@ -157,7 +167,7 @@ mod_carousel_server <- function(id, section_data) {
                       columnDefs =
                         list(list(
                           className = "dt-center",
-                          targets = 1:(ncol(data_source) - 1)
+                          targets = 1:(num_columns - 1)
                         )),
                       rowCallback = DT::JS("replaceNAWithS")
                     ),
@@ -165,9 +175,9 @@ mod_carousel_server <- function(id, section_data) {
                   )
 
                 formatted_table <- switch(current_graph$data_format_type,
-                  "rate" = unformatted_table %>% DT::formatRound(2:ncol(data_source), 1),
-                  "percent" = unformatted_table %>% DT::formatPercentage(2:ncol(data_source), 1),
-                  "currency" = unformatted_table %>% DT::formatCurrency(2:ncol(data_source), 0)
+                  "rate" = unformatted_table %>% DT::formatRound(2:num_columns, 1),
+                  "percent" = unformatted_table %>% DT::formatPercentage(2:num_columns, 1),
+                  "currency" = unformatted_table %>% DT::formatCurrency(2:num_columns, 0)
                 )
 
                 formatted_table
@@ -176,7 +186,7 @@ mod_carousel_server <- function(id, section_data) {
             tags$hr(),
             tags$div(
               tags$span(class = "fw-bold", "Notes:"),
-              tags$p(class = "fs-6 mb-1", HTML(current_graph$note))
+              tags$p(class = "fs-6 mb-1", HTML(current_graph$data_note))
             ),
             footer = tagList(
               tags$span(HTML(paste(tags$span(class = "fw-bold", "Last Updated:"), current_graph$last_updated))),
