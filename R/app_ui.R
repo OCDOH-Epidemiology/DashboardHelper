@@ -20,18 +20,21 @@ app_ui <- function(request) {
             class = "p-4",
             shiny::fileInput("file_in", "Upload the JSON file here:", accept = c(".json")),
             shiny::actionButton("examine_json", "Execute"),
+            shinyjs::hidden(tags$h3(id = "refresh_message", "To upload a different JSON file, please refresh the page.")),
             shiny::uiOutput("head", class = "mt-3"),
             shiny::uiOutput("body", class = "mt-3"),
             shiny::uiOutput("foot", class = "mt-3"),
             shiny::uiOutput("preview", class = "my-4"),
             tags$div(
               class = "fixed-bottom bg-outer-space",
-              shiny::actionButton("update_preview", "Update Preview", class = "float-end m-2"),
               shiny::downloadButton("download_json", class = "float-end m-2")
             )
           )
         )
-      )
+      ),
+      # Add the JS script here
+      tags$script(src = "www/replace_na.js"),
+      tags$script(src = "www/carousel_resize.js")
     )
   )
 }

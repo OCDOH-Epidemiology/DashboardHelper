@@ -315,34 +315,6 @@ app_server <- function(input, output, session) {
     }
   )
 
-  data_to_preview <- reactiveVal()
-
-  observeEvent(input$update_preview, {
-    data_from_inputs <- generate_list_from_inputs(input)
-    data_to_preview(data_from_inputs)
-  })
-
-  output$preview <- renderUI({
-    data <- data_to_preview()
-
-    if (is.null(data)) {
-      return(NULL) # Initial state, nothing to show
-    }
-
-    print("Updating preview!")
-
-    # jsonlite::toJSON(data, pretty = TRUE)
-
-    tagList(
-      create_header(data$head),
-      create_body(data$body),
-      create_footer(data$foot),
-      lapply(1:input$num_sections, function(i) {
-        mod_carousel_server(tolower(gsub(" ", "-", data$body[[i]]$indicator)), data$body[[i]])
-      })
-    )
-  })
-
   observeEvent(input$examine_json, {
     if (isolate(is.null(input$file_in))) {
       shinyjs::alert("Please upload a JSON file.")
@@ -360,6 +332,27 @@ app_server <- function(input, output, session) {
 
       import_JSON(session, json_data)
     })
+
+    output$preview <- renderUI({
+      preview_data <- generate_list_from_inputs(input)
+
+      if (is.null(preview_data)) {
+        return(NULL) # Initial state, nothing to show
+      }
+
+      tagList(
+        create_header(preview_data$head),
+        create_body(preview_data$body),
+        create_footer(preview_data$foot),
+        lapply(1:input$num_sections, function(i) {
+          mod_carousel_server(tolower(gsub(" ", "-", preview_data$body[[i]]$indicator)), preview_data$body[[i]])
+        })
+      )
+    })
+    
+    shinyjs::hideElement("file_in", anim = TRUE, time = 0.5)
+    shinyjs::hideElement("examine_json", anim = TRUE, time = 0.5)
+    shinyjs::showElement("refresh_message", anim = TRUE, time = 0.5)
   })
 
   observeEvent(input$num_footnotes, {
