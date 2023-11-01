@@ -20,7 +20,6 @@ app_ui <- function(request) {
             class = "p-4",
             shiny::fileInput("file_in", "Upload the JSON file here:", accept = c(".json")),
             shiny::actionButton("examine_json", "Execute"),
-            shinyjs::hidden(tags$h3(id = "refresh_message", "To upload a different JSON file, please refresh the page.")),
             shiny::uiOutput("head", class = "mt-3"),
             shiny::uiOutput("body", class = "mt-3"),
             shiny::uiOutput("foot", class = "mt-3"),

@@ -332,10 +332,6 @@ app_server <- function(input, output, session) {
 
       import_JSON(session, json_data)
     })
-
-    shinyjs::hideElement("file_in", anim = TRUE, time = 0.5)
-    shinyjs::hideElement("examine_json", anim = TRUE, time = 0.5)
-    shinyjs::showElement("refresh_message", anim = TRUE, time = 0.5)
   })
 
   preview_num <- reactiveVal(0)
