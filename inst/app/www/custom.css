@@ -13,33 +13,33 @@ sup {
 }
 
 .bg-blue-jeans {
-  background: #61c2ee;
-  color: #40514e;
+  background: #61c2ee !important;
+  color: #40514e !important;
 }
 
 .bg-outer-space {
-  background-color: #40514e;
-  color: #d7ecfa;
+  background-color: #40514e !important;
+  color: #d7ecfa !important;
 }
 
 .bg-palm-leaf {
-  background-color: #67a142;
-  color: #40514e;
+  background-color: #67a142 !important;
+  color: #40514e !important;
 }
 
 .bg-persian-green {
-  background-color: #00a79e;
-  color: #d7ecfa;
+  background-color: #00a79e !important;
+  color: #d7ecfa !important;
 }
 
 .bg-teal {
-  background-color: #007b85;
-  color: white;
+  background-color: #007b85 !important;
+  color: white !important;
 }
 
 .bg-water {
-  background-color: #d7ecfa;
-  color: #40514e;
+  background-color: #d7ecfa !important;
+  color: #40514e !important;
 }
 
 .fa {
