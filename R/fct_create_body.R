@@ -7,7 +7,7 @@
 #' @return A list of HTML sections representing the report body.
 #'
 #' @noRd
-create_body <- function(body_data) {
+create_body <- function(body_data, preview_num) {
   if (length(body_data) == 0) {
     return()
   }
@@ -53,12 +53,12 @@ create_body <- function(body_data) {
         if (i %% 2 == 0) {
           tagList(
             div(class = "col-xxl-6 col-xl-5 px-5 description-area order-xl-1 align-self-center", indicator_description_area),
-            div(class = "col-xxl-6 col-xl-7 order-xl-2", mod_carousel_ui(tolower(gsub(" ", "-", indicator)), current_section, "dark"))
+            div(class = "col-xxl-6 col-xl-7 order-xl-2", mod_carousel_ui(paste0(tolower(gsub(" ", "-", indicator)), preview_num), current_section, "dark"))
           )
         } else {
           tagList(
             div(class = "col-xxl-6 col-xl-5 px-5 description-area order-xl-2 align-self-center", indicator_description_area),
-            div(class = "col-xxl-6 col-xl-7 order-xl-1", mod_carousel_ui(tolower(gsub(" ", "-", indicator)), current_section, "light"))
+            div(class = "col-xxl-6 col-xl-7 order-xl-1", mod_carousel_ui(paste0(tolower(gsub(" ", "-", indicator)), preview_num), current_section, "light"))
           )
         }
       )

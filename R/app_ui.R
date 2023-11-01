@@ -27,6 +27,7 @@ app_ui <- function(request) {
             shiny::uiOutput("preview", class = "my-4"),
             tags$div(
               class = "fixed-bottom bg-outer-space",
+              shiny::actionButton("update_preview", "Update Preview", class = "float-end m-2"),
               shiny::downloadButton("download_json", class = "float-end m-2")
             )
           )

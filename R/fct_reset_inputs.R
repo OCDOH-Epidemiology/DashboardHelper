@@ -30,7 +30,7 @@ reset_body <- function(session, constants) {
   # Loop through each section (visible or not) and reset the values
   for (i in 1:constants$MAX_BODY_SECTIONS) {
     # Reset the section indicator
-    shiny::updateTextInput(session, paste0("section_indicator", i), value = "")
+    shiny::updateTextInput(session, paste0("section_indicator", i), value = paste0("Section ", i))
 
     # Reset the slider determining the number of paragraphs for the section
     shiny::updateSliderInput(session, paste0("section_num_paragraphs", i), value = 0)

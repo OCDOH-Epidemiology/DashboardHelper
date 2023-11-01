@@ -170,7 +170,7 @@ app_server <- function(input, output, session) {
             collapsible = TRUE,
             collapsed = TRUE,
             width = 12,
-            shiny::textInput(paste0("section_indicator", i), "Section Indicator"),
+            shiny::textInput(paste0("section_indicator", i), "Section Indicator", value = paste0("Section ", i)),
             indicator_paragraph_input_section(i),
             subindicator_input_section(i),
             shiny::sliderInput(paste0("section_num_graphs", i), "Number of Graphs in Section", 1, constants$MAX_BODY_SECTION_GRAPHS, 1, 1),
@@ -333,26 +333,32 @@ app_server <- function(input, output, session) {
       import_JSON(session, json_data)
     })
 
-    output$preview <- renderUI({
-      preview_data <- generate_list_from_inputs(input)
-
-      if (is.null(preview_data)) {
-        return(NULL) # Initial state, nothing to show
-      }
-
-      tagList(
-        create_header(preview_data$head),
-        create_body(preview_data$body),
-        create_footer(preview_data$foot),
-        lapply(1:input$num_sections, function(i) {
-          mod_carousel_server(tolower(gsub(" ", "-", preview_data$body[[i]]$indicator)), preview_data$body[[i]])
-        })
-      )
-    })
-    
     shinyjs::hideElement("file_in", anim = TRUE, time = 0.5)
     shinyjs::hideElement("examine_json", anim = TRUE, time = 0.5)
     shinyjs::showElement("refresh_message", anim = TRUE, time = 0.5)
+  })
+
+  preview_num <- reactiveVal(0)
+
+  observeEvent(input$update_preview, {
+    # Increment the value of preview_num to use for the id of creating the module calls
+    preview_num(preview_num() + 1)
+
+    preview_data <- generate_list_from_inputs(input)
+    removeUI("#preview")
+    insertUI(
+      selector = "#foot",
+      where = "afterEnd",
+      tags$div(
+        id = "preview",
+        create_header(preview_data$head),
+        create_body(preview_data$body, preview_num()),
+        create_footer(preview_data$foot),
+        lapply(1:input$num_sections, function(i) {
+          mod_carousel_server(paste0(tolower(gsub(" ", "-", preview_data$body[[i]]$indicator)), preview_num()), preview_data$body[[i]])
+        })
+      )
+    )
   })
 
   observeEvent(input$num_footnotes, {

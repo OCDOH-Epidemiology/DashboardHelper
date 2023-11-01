@@ -194,7 +194,8 @@ mod_carousel_server <- function(id, section_data) {
             )
           )
         )
-      })
+      },
+      ignoreInit = TRUE)
 
       outputOptions(output, paste0("graph", i), suspendWhenHidden = FALSE)
     })
