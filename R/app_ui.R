@@ -9,16 +9,32 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
-    bootstrapPage(
+    shiny::bootstrapPage(
+      shinyjs::useShinyjs(),
       theme = bslib::bs_theme(version = 5),
-      tags$section(
-        class = "p-4",
-        shiny::selectInput("section_selection", "What code do you want to generate?", c("New Data Set", "Head Section", "Foot Section", "Body Section")),
-        mod_new_data_set_ui("new-data"),
-        mod_head_ui("head"),
-        mod_foot_ui("foot"),
-        mod_body_ui("body")
-      )
+      shinydashboard::dashboardPage(
+        shinydashboard::dashboardHeader(disable = TRUE),
+        shinydashboard::dashboardSidebar(disable = TRUE),
+        shinydashboard::dashboardBody(
+          tags$section(
+            class = "p-4",
+            shiny::fileInput("file_in", "Upload the JSON file here:", accept = c(".json")),
+            shiny::actionButton("examine_json", "Execute"),
+            shiny::uiOutput("head", class = "mt-3"),
+            shiny::uiOutput("body", class = "mt-3"),
+            shiny::uiOutput("foot", class = "mt-3"),
+            shiny::uiOutput("preview", class = "my-4"),
+            tags$div(
+              class = "fixed-bottom bg-outer-space",
+              shiny::actionButton("update_preview", "Update Preview", class = "float-end m-2"),
+              shiny::downloadButton("download_json", class = "float-end m-2")
+            )
+          )
+        )
+      ),
+      # Add the JS script here
+      tags$script(src = "www/replace_na.js"),
+      tags$script(src = "www/carousel_resize.js")
     )
   )
 }
@@ -38,7 +54,17 @@ golem_add_external_resources <- function() {
   )
 
   tags$head(
+    tags$html(lang = "en"),
+    tags$html(charset = "utf-8"),
     favicon(),
+
+    # Link to Font Awesome
+    tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"),
+
+    # Links to Google Fonts
+    tags$link(rel = "preconnect", href = "https://fonts.googleapis.com"),
+    tags$link(rel = "preconnect", href = "https://fonts.gstatic.com"),
+    tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;600;700;900&family=Secular+One&display=swap"),
     bundle_resources(
       path = app_sys("app/www"),
       app_title = "DashboardHelper"

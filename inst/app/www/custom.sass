@@ -10,6 +10,8 @@ $water: rgb(215, 236, 250)
 // Main Styling
 body
     font-family: 'Montserrat', sans-serif
+    background-color: $water
+    color: $outer-space
 
 h1
     font-weight: 900
@@ -23,28 +25,83 @@ sup
 
 // Background Colors
 .bg-blue-jeans
-    background: $blue-jeans
-    color: $outer-space
+    background: $blue-jeans!important
+    color: $outer-space!important
 
 .bg-outer-space
-    background-color: $outer-space
-    color: $water
+    background-color: $outer-space!important
+    color: $water!important
 
 .bg-palm-leaf
-    background-color: $palm-leaf
-    color: $outer-space
+    background-color: $palm-leaf!important
+    color: $outer-space!important
 
 .bg-persian-green
-    background-color: $persian-green
-    color: $water
+    background-color: $persian-green!important
+    color: $water!important
 
 .bg-teal
-    background-color: $teal
-    color: white
+    background-color: $teal!important
+    color: white!important
 
 .bg-water
-    background-color: $water
-    color: $outer-space
+    background-color: $water!important
+    color: $outer-space!important
+
+// Font Awesome Styles
+.fa
+    display: inline-block
+    font-size: 24px
+    margin-right: 10px
+
+    &-youtube
+        color: #ff0000
+
+    &-facebook
+        color: #3b5998
+
+    &-twitter
+        color: #1da1f2
+
+    &-instagram
+        color: transparent
+        background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)
+        background: -webkit-radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)
+        background-clip: text
+        -webkit-background-clip: text
+
+// Navbar
+.navbar
+@media screen and (max-width: 440px)
+    .container-fluid
+        justify-content: center !important
+.navbar-brand
+    font-size: 2.5rem
+    font-weight: 900
+    img
+        height: 80px
+    .navbar-brand-full
+        display: inline!important
+    .navbar-brand-abbreviated
+        display: none!important
+    @media screen and (max-width: 840px)
+        .navbar-brand-full
+            display: none!important
+        .navbar-brand-abbreviated
+            display: inline!important
+    @media screen and (max-width: 440px)
+        .navbar-brand-full
+            display: none!important
+        .navbar-brand-abbreviated
+            display: none!important
+
+.carousel-inner
+.plot-container
+    .main-svg
+        border-radius: 8px
+
+.modal-footer
+    justify-content: space-between
 
 // Footnotes
 .footnote-link
