@@ -47,7 +47,7 @@ rsconnect::deployApp(
     # Add any additional files unique to your app here.
     "R/",
     "inst/",
-    #"data/", #No data in project
+    "data/", # Includes the sample data
     "NAMESPACE",
     "DESCRIPTION",
     "app.R"
